@@ -8,7 +8,7 @@
 | TeamName    |         OneOOne         |
 | Captain     |       Aditya Bandal     |
 | Captain     |  abandal2@illinois.edu  |
-| Member1     |        Sasi        |
+| Member1     |        Sasi Pavan Chowdary Surapaneni        |
 | Member1     |   ss257@illinois.edu  |
 | Member2     |   Prathamesh Bhosale                  |
 | Member2     |   bhosale5@illinois.edu                     |
