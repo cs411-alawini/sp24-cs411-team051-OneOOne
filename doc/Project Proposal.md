@@ -23,9 +23,9 @@ We are going to use the following realworld dataset with some augmentation to te
     a. Format - csv
     b. Cardinality - 278
     c. Data - Date, Account	Category, Subcategory, Note, Income/Expense, Amount, Currency, Balance
-2. @adityabandal's expense data from Oct 2021 to Dec 2023
+2. @adityabandal's expense data from Oct 2021 to Oct 2023
     a. Format - csv
-    b. Cardinality - 297
+    b. Cardinality - 295
     c. Data - Date,	Category, Subcategory, Comment, Debit/Credit, Amount, Currency, Balance    
 CSV files are present in doc/Datasets folder
 
