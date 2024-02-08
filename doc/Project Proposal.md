@@ -35,17 +35,27 @@ Our expense manager application offers a comprehensive suite of features to empo
 Furthermore, users can leverage powerful analytics tools to gain insights into their spending habits. By analyzing expenses based on categories, subcategories, weeks, and months, users can identify trends and areas for improvement. Moreover, our application enables users to set monthly budget goals, with built-in alerts to notify users if they exceed their budget limits. Additionally, users can schedule reminders for bill payments, facilitating timely payments and reducing the risk of late fees. With these robust features, our expense manager application serves as a reliable companion in achieving financial stability and success.
 
 ## Low fidelity UI mockup
-# TO DO:
-Add following UI mock ups - 
-1. User is able to add expenses and income manually with the category, subcategory etc (create expense/income form)
-2. User is able to view/edit categories and sub categories (Edit categories form)
-3. User is able to view a analytics of their expenses based on he category, subcategory, week, month to get insights into their spending habits (pie chart or graph)
-4. User is able to set a monthly budget goal, the application will alert the user if they breach the goal (Create reminder form - name, recurrence, end date)
-5. The user can set reminder for bill payment, for eg - pay the rent on 1st date of each month, settle owed money biweekly etc (Create budget form - start date, end date, amount)
+
+### Home Page
+![1](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/07430d36-2c59-4514-951f-f10c5924cc00)
+
+### Add Transaction
+![2](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/77af91e5-86c3-4959-8fed-ef43fc6c517d)
+
+### Insight Page
+![3](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/95d71a46-4517-4c6a-ab7a-f4bfe516a8b1)
+
+### Transaction History
+![4](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/45b02061-894a-4db1-9848-abfe7266d308)
+
+### Track Budget
+![Home Page](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/cc6498f0-0b50-46f7-bd0f-bdcc683928cd)
+
+
 
 ## Work distribution
 1. Aaditya Bodke (Frontend) - Data modelling, UI Design, template creation, reminders and budget
-2. Prathamesh Bhosale (Frontend) - Data modelling, Data insertion, analytics
-3. Sasi Pavan Chowdary Surapaneni (Backend) - Data modelling, API developmemt, triggers and prcedures creation
+2. Prathamesh Bhosale (Frontend) - Data modelling, Data insertion, Analytics and API developmemt
+3. Sasi Pavan Chowdary Surapaneni (Backend) - Data modelling,  triggers and prcedures creation
 4. Aditya Bandal (Backend) - Data modelling, Tables creation, indexing, optimization
 
