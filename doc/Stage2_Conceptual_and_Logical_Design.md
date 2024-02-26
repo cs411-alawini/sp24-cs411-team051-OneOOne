@@ -3,6 +3,67 @@
 ### UML Diagram
 ![expense_manager_UML](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/42375666/4e3c8435-53e0-4bf5-b42c-eeaaac67c2af)
 
+### Entities
+
+#### Transactions
+  This is the central entity that represents all the expenses and income with additional information regarding the payment method and type of expense.
+  
+  Assumptions:
+  - The given attributes are assumed to be limited to the following values
+      - PaymentMethod: [‘Cash, ’Credit Card’, ‘Debit Card’, ‘Zelle’]
+      - Type: [‘Income’, ‘Expense’]
+  - A subcategory can be added to a transaction if and only its parent category is present in the category field.
+
+
+
+
+
+
+#### Categories
+This entity represents the categories that a transaction belongs to.
+
+  ##### Assumptions:
+  - A transaction can have one category at max.
+
+
+#### Subcategory
+This entity represents the subcategories for the transactions at first glance it might seem that it could be merged with the categories entity but the reason we promoted it to be a separate entity is due to the fact that some of the subcategories are shared by multiple categories. For example, the subcategory "Groceries" can be present in both Categories “Household” and “Travel”.
+
+  ##### Assumptions:
+  - At most one subcategory can be added to a transaction.
+
+#### Attachment
+The Attachment entity represents the receipts or any other transaction-related documents in image or PDF format.
+
+  ##### Assumptions:
+  - There could be 0 or 1 attachment for a given transaction.
+
+#### CategoryBudget
+This represents a category-wise budget recurring every month.
+
+  ##### Assumptions:
+  - The budget for each category remains constant every month unless edited by the user. 
+
+#### BillReminders
+The reminders are stored in this entity with the recurrence of the reminders handled using a cron expression.
+
+  ##### Assumptions:
+  - The attribute recurrence is assumed to contain one of the following values:
+    - Monthly
+    - Bi-weekly
+    - Weekly
+	
+
+### Relations
+
+- A Transaction might have 0 or 1 attachment associated with it.
+- A Transaction can also have 0 or 1 category.
+- A Transaction can have 0 or 1 subcategory provided that the category field is populated.
+- A Category can have 0 or n different subcategories associated with it.
+- A Category can have 0 or 1 Budget associated with it.
+
+
+
 ### Normalization
 The functional dependencies are -
 1. TransactionId -> Title, Timestamp, Amount,  PaymentMethod, Comment, Type
@@ -19,3 +80,4 @@ A relation is in BCNF if -
 * X should be a superkey for every functional dependency X−>Y in a given relation. 
 
 Every LHS in the FD’s is the primary key of the relation ( Subcategory is a weak entity dependent on Category so its primary key is [CategoryId, SubcategoryId]) and two attribute relations are always in BCNF so the schema is in BCNF form.
+
