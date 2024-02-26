@@ -1,4 +1,9 @@
 # SpendSmart
+
+## Project Summary
+
+SpendSmart aims to create an intuitive expense manager app to simplify personal finance management, offering features like expense tracking, budget setting, bill reminders, and insightful analysis. Users can manually input expenses for accurate data, while advanced functions like customizable categories and currency conversion provide valuable insights.
+
 ## Description 
 Our project aims to develop a comprehensive expense manager application designed to simplify and streamline personal finance management for users. With a user-friendly interface and robust features, our application will empower individuals to track their expenses, set budgets, and achieve their financial goals with ease. Users will have the flexibility to manually input their expenses, ensuring accurate and up-to-date financial data at their fingertips.
 
