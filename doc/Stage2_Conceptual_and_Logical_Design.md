@@ -81,3 +81,33 @@ A relation is in BCNF if -
 
 Every LHS in the FD’s is the primary key of the relation ( Subcategory is a weak entity dependent on Category so its primary key is [CategoryId, SubcategoryId]) and two attribute relations are always in BCNF so the schema is in BCNF form.
 
+
+### Relational Schema 
+Transaction(Id: INT [PK],
+Title: VARCHAR(X),
+Amount: REAL,
+Timestamp: DATETIME,
+Note: VARCHAR(X),
+PaymentMethod: VARCHAR(X),
+Type: VARCHAR(X),
+CategoryId: INT [FK to Category.CategoryId],
+SubCategoryId: INT [FK to SubCategory.SubCategoryId],
+AttachmentId: INT [FK to Attachment.AttachmentId])
+
+Category(CategoryId: INT [PK], Name: VARCHAR(X))
+
+CategoryBudget(BudgetId: INT [PK],
+Description: VARCHAR(X),
+Amount: DECIMAL,
+CategoryId: INT [FK to Category.CategoryId])
+
+Attachment(AttachmentId: INT [PK], Blob: BLOB)
+
+SubCategory(SubCategoryId: INT [PK], Name: VARCHAR(X))
+
+
+BillReminder(ReminderId: INT [PK],
+Name: VARCHAR(X),
+Recurrence: VARCHAR(X),
+Description: VARCHAR(X))
+
