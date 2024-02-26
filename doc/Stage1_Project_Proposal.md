@@ -2,12 +2,12 @@
 
 ## Project Summary
 
-SpendSmart aims to create an intuitive expense manager app to simplify personal finance management, offering features like expense tracking, budget setting, bill reminders, and insightful analysis. Users can manually input expenses for accurate data, while advanced functions like customizable categories and currency conversion provide valuable insights.
+SpendSmart aims to create an intuitive expense manager app to simplify personal finance management, offering features like expense tracking, budget setting, bill reminders, and insightful analysis. Users can manually input expenses for accurate data, while advanced functions like customizable categories provide valuable insights.
 
 ## Description 
 Our project aims to develop a comprehensive expense manager application designed to simplify and streamline personal finance management for users. With a user-friendly interface and robust features, our application will empower individuals to track their expenses, set budgets, and achieve their financial goals with ease. Users will have the flexibility to manually input their expenses, ensuring accurate and up-to-date financial data at their fingertips.
 
-Furthermore, our expense manager application will offer advanced functionalities such as customizable expense categories, real-time currency conversion, and expense analysis to provide users with valuable insights into their spending habits and financial trends. The application will also provide a budget functionality in order to motivate the user to limit their spending within the provided amount. With features like bill reminders (eg Pay rent on 1st of each month) our application will serve as a trusted companion in navigating the complexities of personal finance management efficiently.
+Furthermore, our expense manager application will offer advanced functionalities such as customizable expense categories, and expense analysis to provide users with valuable insights into their spending habits and financial trends. The application will also provide a category budget functionality in order to motivate the user to limit their spending within the provided amount for a particular category. With features like bill reminders (eg Pay rent on 1st of each month) our application will serve as a trusted companion in navigating the complexities of personal finance management efficiently.
 
 ## Creative component
 Analytics are important in expense manager applications as they provide users with insights of their spending habits and trends. By analyzing the data, users can identify areas where they may be overspending, track progress towards their financial goals, and make informed decisions about budgeting and saving in the future. Analytics also help users understand how their expenses fluctuate over time (week, month etc) or categories (utilities, eating out etc), allowing them to adjust their financial habits accordingly.
@@ -20,7 +20,7 @@ Implementing analytics in our application can be challenging due to several reas
 Nevertheless, adding analytics capabilities to expense manager application is crucial to giving customers the useful information they need to improve their financial well-being and achieve their goals.
 
 ## Usefulness
-This expense manager application is highly beneficial as it provides users with a user-friendly platform to track their expenses, set budgets, and gain insights into their spending habits. With features like expense categorization, real-time currency conversion, and expense analysis, users can efficiently manage their finances and make informed decisions. The application also offers convenience through bill reminders, ensuring users stay organized and on top of their financial commitments. Overall, this application empowers individuals to take control of their finances, promoting financial awareness and responsible money management.
+This expense manager application is highly beneficial as it provides users with a user-friendly platform to track their expenses, set budgets, and gain insights into their spending habits. With features like expense categorization, and expense analysis, users can efficiently manage their finances and make informed decisions. The application also offers convenience through bill reminders, ensuring users stay organized and on top of their financial commitments. Overall, this application empowers individuals to take control of their finances, promoting financial awareness and responsible money management.
 
 ## Realness
 We are going to use the following realworld dataset with some augmentation to test our application - 
@@ -37,7 +37,7 @@ CSV files are present in doc/Datasets folder
 ## Functionality
 Our expense manager application offers a comprehensive suite of features to empower users in managing their finances efficiently. Users can seamlessly add expenses and income manually, specifying categories and subcategories for accurate tracking. Additionally, our application provides flexibility by allowing users to view and edit categories and subcategories according to their preferences, ensuring personalized financial management.
 
-Furthermore, users can leverage powerful analytics tools to gain insights into their spending habits. By analyzing expenses based on categories, subcategories, weeks, and months, users can identify trends and areas for improvement. Moreover, our application enables users to set monthly budget goals, with built-in alerts to notify users if they exceed their budget limits. Additionally, users can schedule reminders for bill payments, facilitating timely payments and reducing the risk of late fees. With these robust features, our expense manager application serves as a reliable companion in achieving financial stability and success.
+Furthermore, users can leverage powerful analytics tools to gain insights into their spending habits. By analyzing expenses based on categories, subcategories, weeks, and months, users can identify trends and areas for improvement. Moreover, our application enables users to set monthly budget goals for a particular category (for example to limit spendings on eating out to 50USD per month), with built-in alerts to notify users if they exceed their budget limits. Additionally, users can schedule reminders for bill payments, facilitating timely payments and reducing the risk of late fees. With these robust features, our expense manager application serves as a reliable companion in achieving financial stability and success.
 
 ## Low fidelity UI mockup
 
