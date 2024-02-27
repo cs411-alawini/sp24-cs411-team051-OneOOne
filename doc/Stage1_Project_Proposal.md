@@ -34,6 +34,8 @@ We are going to use the following realworld dataset with some augmentation to te
     c. Data - Date,	Category, Subcategory, Comment, Debit/Credit, Amount, Currency, Balance    
 CSV files are present in doc/Datasets folder
 
+Note: Since the data available is limited, we are planning to generate realistic transcation data to augment the dataset.
+
 ## Functionality
 Our expense manager application offers a comprehensive suite of features to empower users in managing their finances efficiently. Users can seamlessly add expenses and income manually, specifying categories and subcategories for accurate tracking. Additionally, our application provides flexibility by allowing users to view and edit categories and subcategories according to their preferences, ensuring personalized financial management.
 
