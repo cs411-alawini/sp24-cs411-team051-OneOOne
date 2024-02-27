@@ -5,7 +5,7 @@
 
 ### 2 Entities
 
-#### 2.1 Transactions
+#### 2.1 Transaction
   This is the central entity that represents all the expenses and income with additional information regarding the payment method and type of expense.
   
   Assumptions:
@@ -19,7 +19,7 @@
 
 
 
-#### 2.2 Categories
+#### 2.2 Category
 This entity represents the categories that a transaction belongs to.
 
   ##### Assumptions:
@@ -27,7 +27,7 @@ This entity represents the categories that a transaction belongs to.
 
 
 #### 2.3 Subcategory
-This entity represents the subcategories for the transactions at first glance it might seem that it could be merged with the categories entity but the reason we promoted it to be a separate entity is due to the fact that some of the subcategories are shared by multiple categories. For example, the subcategory "Groceries" can be present in both Categories “Household” and “Travel”.
+This entity represents the subcategories for the transactions. At first glance it might seem that it could be merged with the category entity but the reason we promoted it to be a separate entity is due to the fact that some of the subcategories can be shared by multiple categories. For example, the subcategory "Groceries" can be present in both Categories “Household” and “Travel” Or "Beer" can be in "House Party" and "Vacation".
 
   ##### Assumptions:
   - At most one subcategory can be added to a transaction.
@@ -56,11 +56,11 @@ The reminders are stored in this entity with the recurrence of the reminders han
 
 ### 3 Relations
 
-- A Transaction might have 0 or 1 attachment associated with it.
-- A Transaction can also have 0 or 1 category.
-- A Transaction can have 0 or 1 subcategory provided that the category field is populated.
-- A Category can have 0 or n different subcategories associated with it.
-- A Category can have 0 or 1 Budget associated with it.
+- A Transaction might have 0 or 1 attachment associated with it. A Attachment has exactly 1 transaction associated with it. (One to One Relationship)
+- A Transaction can also have 0 or 1 category. A Category can be associated with 0 or n transactions. (One to Many Relationship)
+- A Transaction can have 0 or 1 subcategory provided that the category field is populated. A Subcategory can be associated with 0 or n transactions.(One to Many Relationship)
+- A Category can have 0 or n different subcategories associated with it. A Subcategory can belong to 1 or n different categories. (Many to Many Relationship)
+- A Category can have 0 or 1 Budget associated with it. A budget is associated exactly 1 category. (One to One Relationship) 
 
 
 
@@ -70,6 +70,7 @@ The functional dependencies are -
 2. CategoryId, SubcategoryId -> Name
 3. BudgetId -> Description, Amount
 4. ReminderId -> Name, Recurrence, Description
+(Note: FD's for two attribute relations are not shown here)
 
 A relation is in 3NF if at least one of the following conditions holds in every non-trivial function dependency X –> Y -
 * X is a super key.
@@ -83,31 +84,48 @@ Every LHS in the FD’s is the primary key of the relation ( Subcategory is a we
 
 
 ### 5 Relational Schema 
-Transaction(Id: INT [PK],
-Title: VARCHAR(X),
-Amount: REAL,
-Timestamp: DATETIME,
-Note: VARCHAR(X),
-PaymentMethod: VARCHAR(X),
-Type: VARCHAR(X),
-CategoryId: INT [FK to Category.CategoryId],
-SubCategoryId: INT [FK to SubCategory.SubCategoryId],
-AttachmentId: INT [FK to Attachment.AttachmentId])
+```
+Transaction(
+	Id: INT [PK],
+	Title: VARCHAR(X),
+	Amount: REAL,
+	Timestamp: DATETIME,
+	Note: VARCHAR(X),
+	PaymentMethod: [‘Cash, ’Credit Card’, ‘Debit Card’, ‘Zelle’],
+	Type: [‘Income’, ‘Expense’],
+	CategoryId: INT [FK to Category.CategoryId],
+	SubCategoryId: INT [FK to SubCategory.SubCategoryId],
+	AttachmentId: INT [FK to Attachment.AttachmentId]
+)
 
-Category(CategoryId: INT [PK], Name: VARCHAR(X))
+Category(
+	CategoryId: INT [PK],
+	Name: VARCHAR(X)
+)
 
-CategoryBudget(BudgetId: INT [PK],
-Description: VARCHAR(X),
-Amount: DECIMAL,
-CategoryId: INT [FK to Category.CategoryId])
+CategoryBudget(
+	BudgetId: INT [PK],
+	Description: VARCHAR(X),
+	Amount: DECIMAL,
+	CategoryId: INT [FK to Category.CategoryId]
+)
 
-Attachment(AttachmentId: INT [PK], Blob: BLOB)
+Attachment(
+	AttachmentId: INT [PK],
+	Blob: BLOB
+)
 
-SubCategory(SubCategoryId: INT [PK], Name: VARCHAR(X))
+SubCategory(
+	SubCategoryId: INT [PK],
+	Name: VARCHAR(X)
+)
 
 
-BillReminder(ReminderId: INT [PK],
-Name: VARCHAR(X),
-Recurrence: VARCHAR(X),
-Description: VARCHAR(X))
+BillReminder(
+	ReminderId: INT [PK],
+	Name: VARCHAR(X),
+	Recurrence: ['Monthly', 'Bi-weekly', 'Weekly'],
+	Description: VARCHAR(X)
+)
+```
 
