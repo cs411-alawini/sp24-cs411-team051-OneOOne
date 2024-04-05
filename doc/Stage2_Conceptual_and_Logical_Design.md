@@ -1,7 +1,7 @@
 ## Conceptual and Logical Design
 
 ### 1 UML Diagram
-![expense_manager_UML](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/42375666/bf7c95e7-0277-49ab-8c0f-bc76424db6d7)
+![expense_manager_UML](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/42375666/9f29daa0-49ba-45eb-8d15-4591170f41a6)
 
 
 ### 2 Entities
