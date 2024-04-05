@@ -62,6 +62,9 @@ Moreover, sers can utilize the shared expenses functionality in the expense trac
 ### Track Budget
 ![Home Page](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/cc6498f0-0b50-46f7-bd0f-bdcc683928cd)
 
+### Splitting the Bill
+![Home Page](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/89684115/a5c20e72-1373-4dbf-8be8-52e1855e59fd)
+
 
 
 ## Work distribution
