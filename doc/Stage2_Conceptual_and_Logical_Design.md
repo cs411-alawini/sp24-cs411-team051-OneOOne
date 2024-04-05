@@ -88,47 +88,68 @@ Every LHS in the FD’s is the primary key of the relation and two attribute rel
 
 ### 5 Relational Schema 
 ```
-Transaction(
-	Id: INT [PK],
-	Title: VARCHAR(X),
-	Amount: REAL,
-	Timestamp: DATETIME,
-	Note: VARCHAR(X),
-	PaymentMethod: [‘Cash, ’Credit Card’, ‘Debit Card’, ‘Zelle’],
-	Type: [‘Income’, ‘Expense’],
-	CategoryId: INT [FK to Category.CategoryId],
-	SubCategoryId: INT [FK to SubCategory.SubCategoryId],
-	AttachmentId: INT [FK to Attachment.AttachmentId]
-)
+User (
+  userId : INT [PK],
+  userName : VARCHAR(X),
+  firstName : VARCHAR(X),
+  lastName : VARCHAR(X),
+);
 
-Category(
-	CategoryId: INT [PK],
-	Name: VARCHAR(X)
-)
+UserCredentials (
+  userId : INT [FK to user.userId],
+  email : VARCHAR(X) [PK],
+  passwordsHash : VARCHAR(X)
+);
 
-CategoryBudget(
-	BudgetId: INT [PK],
-	Description: VARCHAR(X),
-	Amount: DECIMAL,
-	CategoryId: INT [FK to Category.CategoryId]
-)
+Transaction (
+  txnId : INT [PK],
+  title : VARCHAR(X),
+  timestamp : DATETIME,
+  note : VARCHAR(X),
+  amount : REAL, 
+  categoryId : INT [FK to Category.categoryId],
+  paymentMethod : [‘Cash, ’Credit Card’, ‘Debit Card’, ‘Zelle’],
+  transactionType : [‘Income’, ‘Expense’],
+  attachmentId : INT [FK to Attachment.AttachmentId],
+  userId : INT [FK to user.userId]
+);
 
 Attachment(
 	AttachmentId: INT [PK],
-	Blob: BLOB
+	Blob: BLOB,
+);
+
+Category(
+	categoryId : INT [PK],
+  userId : INT [FK to user.userId],
+  parentCategoryId : INT [FK to Category.categoryId],
+	categoryName : VARCHAR(X)
+);
+
+MonthlyCategoryBudget(
+	budgetId: INT [PK],
+	description: VARCHAR(X),
+	amount: DECIMAL,
+	categoryId: INT [FK to Category.categoryId],
+  month : INT [1 to 12]
 )
 
-SubCategory(
-	SubCategoryId: INT [PK],
-	Name: VARCHAR(X)
-)
+Split (
+    splitId : INT [PK],
+    title : VARCHAR(X),
+    timestamp : DATETIME,
+    amount : REAL,
+    note : VARCHAR(X),
+    lenderId : INT [FK to user.userId]
+);
 
 
-BillReminder(
-	ReminderId: INT [PK],
-	Name: VARCHAR(X),
-	Recurrence: ['Monthly', 'Bi-weekly', 'Weekly'],
-	Description: VARCHAR(X)
-)
+Borrower (
+    borrowerId : INT [FK to user.userId],
+    splitId : INT [FK to Split.splitId],
+    amount : REAL,
+    isPaid : BOOLEAN
+    (borrowerId, splitId) : [PK]
+);
 ```
 
