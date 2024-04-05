@@ -127,10 +127,11 @@ Category(
 )
 
 MonthlyCategoryBudget(
-	budgetId: INT [PK],
-	description: VARCHAR(X),
-	amount: DECIMAL,
-	categoryId: INT [FK to Category.categoryId],
+  budgetId: INT [PK],
+  description: VARCHAR(X),
+  amount: DECIMAL,
+  categoryId: INT [FK to Category.categoryId],
+  userId : INT [FK to user.userId],
   month : INT [1 to 12]
 )
 
