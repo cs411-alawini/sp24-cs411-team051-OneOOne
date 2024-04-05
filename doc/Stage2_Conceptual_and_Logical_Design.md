@@ -14,56 +14,56 @@
       - PaymentMethod: [‘Cash, ’Credit Card’, ‘Debit Card’, ‘Zelle’]
       - Type: [‘Income’, ‘Expense’]
   - A subcategory can be added to a transaction if and only its parent category is present in the category field.
-
-
-
-
-
+  - Amount can't be negative.
 
 #### 2.2 Category
-This entity represents the categories that a transaction belongs to.
-
+This entity represents the categories and subcategories that a transaction belongs to.
+To achieve this we are adding a parentCategoryId attribute which will be null for categories and have the respective categoryId, of it's parent category, for a subcategory.
   ##### Assumptions:
   - A transaction can have one category at max.
-
-
-#### 2.3 Subcategory
-This entity represents the subcategories for the transactions. At first glance it might seem that it could be merged with the category entity but the reason we promoted it to be a separate entity is due to the fact that some of the subcategories can be shared by multiple categories. For example, the subcategory "Groceries" can be present in both Categories “Household” and “Travel” Or "Beer" can be in "House Party" and "Vacation".
-
-  ##### Assumptions:
   - At most one subcategory can be added to a transaction.
 
-#### 2.4 Attachment
+
+#### 2.3 Attachment
 The Attachment entity represents the receipts or any other transaction-related documents in image or PDF format.
 
   ##### Assumptions:
   - There could be 0 or 1 attachment for a given transaction.
 
-#### 2.5 CategoryBudget
-This represents a category-wise budget recurring every month.
+#### 2.4 MonthlyCategoryBudget
+This represents a category-wise budget changing every month.
 
   ##### Assumptions:
-  - The budget for each category remains constant every month unless edited by the user. 
+  - The Month is an integer having values between 1 and 12.
+  - Amount can't be negative.
 
-#### 2.6 BillReminders
-The reminders are stored in this entity with the recurrence of the reminders handled using a cron expression.
+#### 2.5  User
+The user details such as username, first and last name are stored in this entity.
 
   ##### Assumptions:
-  - The attribute recurrence is assumed to contain one of the following values:
-    - Monthly
-    - Bi-weekly
-    - Weekly
-	
+  - Username is unique to a user
+
+#### 2.6  Credentials
+This entity is used to store password and email for handling the login process. This entity is separated from the user entity for allowing quicker access for authentication.
+
+
+#### 2.7  Split
+This is a central entity for handling the splitting functionality. It stores details regarding the split such as timestamp, amount, etc.
+
+  ##### Assumptions:
+  - Amount can't be negative.
+
 
 ### 3 Relations
 
-- A Transaction might have 0 or 1 attachment associated with it. A Attachment has exactly 1 transaction associated with it. (One to One Relationship)
+- A Transaction might have 0 or 1 attachment associated with it. An Attachment has exactly 1 transaction associated with it. (One to One Relationship)
 - A Transaction can also have 0 or 1 category. A Category can be associated with 0 or n transactions. (One to Many Relationship)
-- A Transaction can have 0 or 1 subcategory provided that the category field is populated. A Subcategory can be associated with 0 or n transactions.(One to Many Relationship)
-- A Category can have 0 or n different subcategories associated with it. A Subcategory can belong to 1 or n different categories. (Many to Many Relationship)
-- A Category can have 0 or 1 Budget associated with it. A budget is associated exactly 1 category. (One to One Relationship) 
-
-
+- A Category can have 0 or n Budgets associated with it. A budget is associated with exactly 1 category. (Many to One Relationship)
+- A user creates 0 or n monthly budgets. A Budget is associated with exactly 1 user. (Many to One Relationship)
+- A user has exactly 1 credential. A credential is associated with exactly 1 user. (One to One Relationship)
+- A user adds 0 or n transactions. A transaction is associated with exactly 1 user.(Many to One Relationship)
+- A user can lend in 0 or n splits. A split has exactly 1 user as lender. (Many to One Relationship)
+- A user can borrow from 0 or n splits. A split can involve 1 or n users as borrowers. (Many to Many Relationship). This relationship has amount and isPaid (boolean) as attributes.
 
 ### 4 Normalization
 The functional dependencies are -
