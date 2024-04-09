@@ -89,6 +89,7 @@ FOREIGN KEY (splitId) REFERENCES Split(splitId)
 
 <img width="876" alt="Screenshot 2024-04-08 at 4 27 04 PM" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/02cd05c4-2d9a-4ecc-b4a9-b29970633796">
 
-<img width="413" alt="Screenshot 2024-04-08 at 4 37 07 PM" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/aefd9abf-8102-42c0-9f2e-da6dc76f0657">
+<img width="410" alt="Screenshot 2024-04-08 at 11 48 13 PM" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/55f3ddc9-f1a6-4469-b9ea-b5563741e5e1">
+
 
 
