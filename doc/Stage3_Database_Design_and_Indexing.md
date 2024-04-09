@@ -1,7 +1,4 @@
-### DDL COMMANDS 
-1.
-USE SpendSmart;
-
+```sql
 CREATE TABLE Credentials (
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -33,7 +30,6 @@ CREATE TABLE Category (
 CREATE TABLE Attachments (
     attachmentId INT NOT NULL AUTO_INCREMENT,
     attachmentBlob LONGBLOB,
-
     PRIMARY KEY (attachmentId)
     
 );
@@ -50,8 +46,7 @@ CREATE TABLE Transactions (
     userId INT,
     attachmentId INT, 
     categoryId INT,
-    
-    PRIMARY KEY (txnId),
+     PRIMARY KEY (txnId),
     FOREIGN KEY (userId) REFERENCES Users(userId),
     FOREIGN KEY (categoryId) REFERENCES  Category(categoryId),
     FOREIGN KEY (attachmentId) REFERENCES Attachments(attachmentId)
@@ -91,3 +86,11 @@ PRIMARY KEY (borrowerId,splitId),
 FOREIGN KEY (borrowerId) REFERENCES Users(userId),
 FOREIGN KEY (splitId) REFERENCES Split(splitId)
 );
+```
+
+
+<img width="876" alt="Screenshot 2024-04-08 at 4 27 04 PM" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/02cd05c4-2d9a-4ecc-b4a9-b29970633796">
+
+<img width="413" alt="Screenshot 2024-04-08 at 4 37 07 PM" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/aefd9abf-8102-42c0-9f2e-da6dc76f0657">
+
+
