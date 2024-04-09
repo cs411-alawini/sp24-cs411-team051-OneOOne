@@ -146,7 +146,7 @@ Result
 
 ##### Indexes
 1. Default => cost = 118.20
-   ![image](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/69220aa2-a44f-4b3c-bf25-f3ef57709e37)
+   <img width="1288" alt="image" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/cea51ee5-72e5-4412-98fc-c7b4b9723369">
 2. Adding index on type in Transaction => cost = 908.74
    <img width="1294" alt="image" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/17e71bbf-9c41-496e-88c8-345ec172d99c">
 3. Adding index on timestamp in Transaction => cost = 118.20
