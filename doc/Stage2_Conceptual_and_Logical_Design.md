@@ -26,6 +26,7 @@ This entity represents the categories that a transaction belongs to eg. househol
 Here Rent is a subcategory of Household.
   ##### Assumptions:
   - At most one category can be added to a transaction.
+  - User can only use categories created by them or system generated categories.
   - There would be only one level of nesting, ie subcategories would not have any further subcategories.
 
 
