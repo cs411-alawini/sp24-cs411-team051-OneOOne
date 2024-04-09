@@ -95,7 +95,7 @@ FOREIGN KEY (splitId) REFERENCES Split(splitId)
 
 #### 1. For a given user, get their current month's category budgets and actual category expenses
 
-```
+```sql
 SELECT categoryId, categoryName, budget, expense  
 FROM (SELECT categoryId, amount as budget FROM MonthlyCategoryBudget 
 	WHERE userId = 1 and YEAR(month) = 2024 and MONTH(month) = 5) as CurrentBudgets 
@@ -125,7 +125,7 @@ The default behaviour of the query shows that it is looking up Transaction table
 
 #### 2. Monthly income and expense for a user
 
-```
+```sql
 WITH 
 UserIncome AS (SELECT YEAR(timestamp) AS Year, MONTH(timestamp) AS Month, SUM(amount) AS Income
 		FROM Transaction
@@ -163,7 +163,7 @@ Ultimately, we chose the default configuration
 
 #### 3. People who owe me money and I owe them money
 
-```
+```sql
 SELECT Id, SUM(Balance)
 FROM
 (SELECT Split.lenderId as Id,  SUM(Borrows.amount)*-1 as Balance
@@ -194,3 +194,38 @@ Result is 9 rows
    <img width="1311" alt="Pasted Graphic 4" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/3b5e9efd-8d1d-42b5-a38f-42b6cb9de728">
 
 For this query there was no gain in performance compared to the default for any of the indexing configurations. We tried adding indexes to Borrows.isPaid, Borrows.borrowerId and Split.lenderId. However, the query cost remained the same even though there were some small changes in execution time. Ultimately, we chose the default configuration.
+
+#### 4. For a given user, month and year, get the category-wise transactions 
+
+```sql
+SELECT
+    C.categoryName,
+    SUM(T.amount) AS totalSpent
+FROM
+       Transaction T
+JOIN
+    Category C ON T.categoryId = C.categoryId
+WHERE
+    T.userId = 2
+    AND MONTH(T.timestamp) = 12
+    AND YEAR(T.timestamp) = 2024
+GROUP BY
+    C.categoryName;
+
+```
+Result is 12 rows
+
+<img width="339" alt="Result" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/3a666b45-2c2a-4173-a433-0aaad0d5e65a">
+
+
+##### Indexes
+1. Default Case => cost = 382.8
+   <img width="1528" alt="0" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/f024cced-e916-47c7-9e38-0f62eeaa7404">
+2. Adding Index on userId in Transaction => cost = 382.8
+   ![1](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/1b1f2eca-54d2-4e05-a782-5176efc15fd5)
+3. Adding index on userId in MonthlyCategoryBudget => cost = 553.14
+   ![2](https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/e0187eb4-54a5-4db4-85d2-1345857803b0)
+4. Adding index on categoryId, userId in MonthlyCategoryBudget => cost = 149.97
+   <img width="1530" alt="3" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/68540700/22c03363-a6f0-4151-93c2-97faf58a21c3">
+
+The default query looks up the transaction table for userId key.  Hence, it was chosen to be the first key to be selected for Indexing, but adding the Index on Transaction for userId did not result in any improvements in the query performance. The second indexing was tested on categoryId in Transaction, again this did not result any performance improvements. As the previous two queries did not result in improvements, we tried implementing composite indexing by creating an index for both userId and categoryId on the Transaction as these two are being compared together in the WHERE clause. This resulted in significant improvement in performance of the query dropping its cost from 382.8 to 23.88. Thus the composite index for (userId,categoryId) on Transaction gives the best performance.
