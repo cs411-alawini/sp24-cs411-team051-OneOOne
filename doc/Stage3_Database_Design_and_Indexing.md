@@ -1,18 +1,18 @@
 ```sql
-CREATE TABLE Credentials (
-    email VARCHAR(255) NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    PRIMARY KEY (email)
-);
-
 CREATE TABLE User (
     userId INT NOT NULL AUTO_INCREMENT,
-    userName VARCHAR(255) NOT NULL,
+    userName VARCHAR(255) UNIQUE NOT NULL,
     firstName VARCHAR(255) NOT NULL,
     lastName VARCHAR(255) NOT NULL,
+    PRIMARY KEY (userId)
+);
+
+CREATE TABLE Credentials (
     email VARCHAR(255) NOT NULL,
-    PRIMARY KEY (userId),
-    FOREIGN KEY (email) REFERENCES Credentials(email)
+    userId INT UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    PRIMARY KEY (email),
+    FOREIGN KEY (userId) REFERENCES User(userId)
 );
 
 CREATE TABLE Category (
@@ -42,7 +42,7 @@ CREATE TABLE Transaction (
     paymentMethod VARCHAR(255),
     type VARCHAR(255) NOT NULL,
     userId INT NOT NULL,
-    attachmentId INT, 
+    attachmentId INT UNIQUE, 
     categoryId INT,
     
     PRIMARY KEY (txnId),
