@@ -154,9 +154,43 @@ Result
 4. Adding composite index on type and timestamp in Transaction => cost = 875.16
    <img width="1288" alt="image" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/5e817d14-687a-4bdc-a828-1120d92bf15e">
 
-The initial config was with no additional indices, the cost here was 118.20. 
+The default config was with no additional indices, the cost here was 118.20. 
 Creating index on Transaction.type led to much worse performance, the cost degraded to 908.74. The FILTER operation on Transaction.type in both subtrees has gotten worse with the 
 presence of the index and it seems to be filtering out only a few rows. These more rows are reaching the upper levels the tree, making their performance worse as well. This may be as the column is VARCHAR(255) which is very large, leading to a large index and slower lookup.
 Creating an index on Transaction.timestamp does not lead to any improvement. This is probably because the query is grouping by year and month of the timestamp, instead of the timestamp directly, so the database is not able to use this index to optimize the query.
 Creating composite index on Transaction.type and Transaction.timestamp also has the same issue as the index on Transaction.timestamp. The query performance gets worse. Here we can see the FILTER operation got pushed high up the tree leading to worse performance than in the initial configuration where the FILTER was done early to limit rows going up the tree.
+Ultimately, we chose the default configuration
 
+#### 3. People who owe me money and I owe them money
+
+```
+SELECT Id, SUM(Balance)
+FROM
+(SELECT Split.lenderId as Id,  SUM(Borrows.amount)*-1 as Balance
+FROM Split JOIN Borrows ON Split.splitId = Borrows.splitId
+WHERE Borrows.borrowerId =  16 AND Borrows.isPaid = False
+GROUP BY Split.lenderId
+UNION ALL
+SELECT Borrows.borrowerId as Id, SUM(Borrows.amount)*1 as Balance
+FROM Split JOIN Borrows ON Split.splitId = Borrows.splitId
+WHERE Split.lenderId =  16 AND Borrows.isPaid = False
+GROUP BY Borrows.borrowerId) A
+GROUP BY Id
+ORDER BY Id;
+```
+Result is 9 rows
+
+<img width="1291" alt="Pasted Graphic" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/b1920528-239a-47e5-8b04-c1e1e2882825">
+
+
+##### Indexes
+1. Default => cost = 2.50
+   <img width="1289" alt="Screenshot 2024-04-09 at 1 54 58 AM" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/d572a9ee-1571-4269-9987-235974e0af21">
+2. Adding index on isPaid in Borrows => cost = 2.50
+   <img width="1286" alt="Pasted Graphic 1" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/c5f8dda8-c631-4148-af07-388b78b8e71d">
+3. Adding index on lenderId in Split => cost = 2.50
+   <img width="1284" alt="Pasted Graphic 2" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/3348f964-dbf0-4f6a-a9d6-73124be794dd">
+4. Adding index on borrowerId in Borrows => cost = 2.50
+   <img width="1311" alt="Pasted Graphic 4" src="https://github.com/cs411-alawini/sp24-cs411-team051-OneOOne/assets/157758764/3b5e9efd-8d1d-42b5-a38f-42b6cb9de728">
+
+For this query there was no gain in performance compared to the default for any of the indexing configurations. We tried adding indexes to Borrows.isPaid, Borrows.borrowerId and Split.lenderId. However, the query cost remained the same even though there were some small changes in execution time. Ultimately, we chose the default configuration.
