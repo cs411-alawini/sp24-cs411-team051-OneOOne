@@ -7,51 +7,57 @@
 ### 2 Entities
 
 #### 2.1 Transaction
-  This is the central entity that represents all the expenses and income with additional information regarding the payment method and type of expense.
+  This is the central entity that represents all financial exchange with additional information like the payment method and type of exchange.
   
   Assumptions:
   - The given attributes are assumed to be limited to the following values
       - PaymentMethod: [‘Cash, ’Credit Card’, ‘Debit Card’, ‘Zelle’]
       - Type: [‘Income’, ‘Expense’]
-  - A subcategory can be added to a transaction if and only its parent category is present in the category field.
   - Amount can't be negative.
 
 #### 2.2 Category
-This entity represents the categories and subcategories that a transaction belongs to.
-To achieve this we are adding a parentCategoryId attribute which will be null for categories and have the respective categoryId, of it's parent category, for a subcategory.
+This entity represents the categories that a transaction belongs to eg. household, healthcare etc. We are providing hierarchical nesting of categories by introducing parentId in this table, where each category may have a parent category. This will allow the user to drill down expenses into subcategories.
+ eg. 
+ | id |parentId| category |
+|--|--|--|
+| 0 |null|Household  |
+|1|0|Rent|
+
+Here Rent is a subcategory of Household.
   ##### Assumptions:
-  - A transaction can have one category at max.
-  - At most one subcategory can be added to a transaction.
+  - At most one category can be added to a transaction.
+  - There would be only one level of nesting, ie subcategories would not have any further subcategories.
 
 
 #### 2.3 Attachment
 The Attachment entity represents the receipts or any other transaction-related documents in image or PDF format.
 
-  ##### Assumptions:
+##### Assumptions:
   - There could be 0 or 1 attachment for a given transaction.
 
 #### 2.4 MonthlyCategoryBudget
-This represents a category-wise budget changing every month.
+This represents a category-wise budget for a month and year.
+For eg. User can set a budget of 80$ for dining out for the month of May 2024
 
   ##### Assumptions:
-  - The Month is an integer having values between 1 and 12.
   - Amount can't be negative.
 
 #### 2.5  User
 The user details such as username, first and last name are stored in this entity.
 
   ##### Assumptions:
-  - Username is unique to a user
+  - Username and emailId is unique to a user
 
 #### 2.6  Credentials
-This entity is used to store password and email for handling the login process. This entity is separated from the user entity for allowing quicker access for authentication.
+This entity is used to store password and email for handling the login process. This entity is separated from the user entity for allowing quicker access for authentication. This design promotes better security practices by enabling more granular access controls.
 
 
 #### 2.7  Split
-This is a central entity for handling the splitting functionality. It stores details regarding the split such as timestamp, amount, etc.
+This is a central entity for handling the expense sharing functionality. It stores details regarding the split such as timestamp, amount, lender, etc.
 
   ##### Assumptions:
   - Amount can't be negative.
+  - Each shared expense has atleast 1 borrower.
 
 
 ### 3 Relations
@@ -98,7 +104,7 @@ User (
 UserCredentials (
   userId : INT [FK to user.userId],
   email : VARCHAR(X) [PK],
-  passwordsHash : VARCHAR(X)
+  passwords : VARCHAR(X)
 )
 
 Transaction (
@@ -115,8 +121,8 @@ Transaction (
 )
 
 Attachment(
-	AttachmentId: INT [PK],
-	Blob: BLOB,
+	attachmentId: INT [PK],
+	attachmentBlob: BLOB,
 )
 
 Category(
@@ -132,7 +138,7 @@ MonthlyCategoryBudget(
   amount: DECIMAL,
   categoryId: INT [FK to Category.categoryId],
   userId : INT [FK to user.userId],
-  month : INT [1 to 12]
+  month : DATE
 )
 
 Split (
@@ -145,11 +151,11 @@ Split (
 )
 
 
-Borrower (
+Borrows (
   borrowerId : INT [FK to user.userId],
   splitId : INT [FK to Split.splitId],
   amount : REAL,
-  isPaid : BOOLEAN
+  isPaid : BOOL
   (borrowerId, splitId) : [PK]
 )
 ```
