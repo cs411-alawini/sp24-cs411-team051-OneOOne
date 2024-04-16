@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spending Management App - Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: auto;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .home-container {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 800px;
+            min-height: 0;
+            width: 100%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="home-container">
+        <h2>All Transactions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Title</th>
+                    <th>Time</th>
+                    <th>Amount</th>
+                    <th>Note</th>
+                    <th>Payment Method</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for txn in txns %}
+                <tr>
+                    <td>{{ txn.0 }} </td>
+                    <td>{{ txn.1 }}</td>
+                    <td>{{ txn.2 }}</td>
+                    <td>{{ txn.3 }}</td>
+                    <td>{{ txn.4 }}</td>
+                    <td>{{ txn.5 }}</td>
+                    <td>{{ txn.6 }}</td>
+                    <td>{{ txn.7 }}</td>
+                </tr>
+                {% endfor %}
+                <!-- Add more transaction rows dynamically here -->
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
