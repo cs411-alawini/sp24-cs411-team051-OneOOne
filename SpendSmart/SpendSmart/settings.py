@@ -77,10 +77,10 @@ WSGI_APPLICATION = "SpendSmart.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'HOST': '127.0.0.1',
+        'HOST': '34.135.17.135',
         'NAME': 'SpendSmart',
-        'USER': 'root',
-        'PASSWORD': 'Decent@256',
+        'USER': 'app',
+        'PASSWORD': '1234',
     }
 }
 

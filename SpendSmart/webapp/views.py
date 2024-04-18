@@ -17,11 +17,10 @@ def home(request):
         return render(request,"index.html")
     cur.execute("SELECT userid FROM User WHERE email = \'{}\'".format(username))
     id = cur.fetchall()[0][0]
-    print(id)
+
     cur.execute("SELECT txnId,title,timestamp,amount,note,paymentMethod,type,categoryId FROM Transaction WHERE userId = {}".format(id))
     data = cur.fetchall()
-    # print(len(data),len(data[0]))
-    # data = []
+
     context = {'txns':data}
     cur.close()
 
