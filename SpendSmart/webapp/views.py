@@ -8,19 +8,22 @@ def index(request):
 
 def home(request):
     cur = connections['default'].cursor()
-    username = request.POST.get("username")
+    email = request.POST.get("email")
     password = request.POST.get("password")
     p =None
-    if cur.execute("SELECT * from Credentials WHERE email = \'{}\'".format(username)):
+    if cur.execute("SELECT * from Credentials WHERE email = \'{}\'".format(email)):
         u,p = cur.fetchall()[0]
     if p!=password:
         return render(request,"index.html")
-    cur.execute("SELECT userid FROM User WHERE email = \'{}\'".format(username))
+    cur.execute("SELECT userid FROM User WHERE email = \'{}\'".format(email))
     id = cur.fetchall()[0][0]
 
-    cur.execute("SELECT txnId,title,timestamp,amount,note,paymentMethod,type,categoryId FROM Transaction WHERE userId = {}".format(id))
+    
+
+    cur.execute("SELECT txnId,title,timestamp,amount,note,paymentMethod,type,categoryName FROM Transaction T JOIN Category C ON T.categoryId = C.categoryId WHERE T.userId = {}".format(id))
     data = cur.fetchall()
 
+    print(len(data))
     context = {'txns':data}
     cur.close()
 

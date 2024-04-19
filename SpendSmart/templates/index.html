@@ -53,10 +53,10 @@
 </head>
 <body>
     <div class="login-container">
-        <h2>Login to Spending Management App</h2>
+        <h2>Login to SpendSmart</h2>
         <form action="home" method="POST">
             {% csrf_token %}
-            <input type="text" name="username" placeholder="Username" required>
+            <input type="text" name="email" placeholder="Email" required>
             <input type="password" name="password" placeholder="Password" required>
             <button type="submit">Login</button>
         </form>
