@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head><meta http-equiv="cache-control" content="no-cache"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="-1"><style type="text/css">body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #ecf0f1;
+}
+.container {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 10px;
+}
+.card {
+  background: #fff;
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.flex-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.flex-column {
+  margin: 10px;
+  min-width: 250px;
+}
+.flex-grow {
+  flex-grow: 1;
+}
+.btn {
+  display: block;
+  padding: 10px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  margin: 10px 0;
+  text-decoration: none;
+}
+.btn:hover {
+  background-color: #2980b9;
+}
+.btn-full-width {
+  width: 100%;
+}
+.budget-container {
+  padding: 10px;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+.budget-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+.progress-bar {
+  height: 20px;
+  background-color: #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+}
+.progress {
+  height: 100%;
+  background-color: #27ae60;
+  line-height: 20px;
+  color: white;
+  text-align: right;
+  padding-right: 5px;
+  border-radius: 5px;
+  transition: width 0.5s ease-in-out;
+}
+@media (max-width: 768px) {
+  .container {
+    width: auto;
+    margin: 10px;
+  }
+  .flex-row {
+    flex-direction: column;
+  }
+}
+@media (max-width: 480px) {
+  .flex-column {
+    margin: 0;
+    margin-bottom: 10px;
+  }
+}
+</style>
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Main Dashboard</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+  
+  <!-- Inflow, Outflow, and Recent Transactions Section -->
+  <div class="card flex-row">
+    <div class="flex-column flex-grow">
+      <h2>Inflow: ${{ inflow }}</h2>
+      <!-- Placeholder for inflow data -->
+      <h2>Outflow: ${{ outflow }}</h2>
+      <!-- Placeholder for outflow data -->
+      <a href="add-transaction.html" class="btn btn-full-width">Add Transaction</a>
+    </div>
+    <div class="flex-column flex-grow">
+      <h2>Recent Transactions</h2>
+      <!-- Placeholder for recent transactions -->
+      <table id="transactionsTable">
+        <thead>
+            <tr>
+                <!-- <th>Transaction ID</th> -->
+                <th>Title</th>
+                <th>Time</th>
+                <th>Amount</th>
+                <!-- <th>Note</th> -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for txn in txns %}
+            <tr class="transactionRow">
+                <!-- <td>{{ txn.0 }} </td> -->
+                <td>{{ txn.0 }}</td>
+                <td>{{ txn.1 }}</td>
+                <td>{{ txn.2 }}</td>
+                <!-- <td>{{ txn.4 }}</td> -->
+            </tr>
+            {% endfor %}
+            <!-- Add more transaction rows dynamically here -->
+        </tbody>
+    </table>
+      <a href="detailed-history.html" class="btn btn-full-width">Detailed History</a>
+    </div>
+  </div>
+
+  <!-- Splits Section -->
+  <div class="card flex-row">
+    <div class="flex-column flex-grow">
+      <h2>Owe: ${{ owes }}</h2>
+      <!-- Placeholder for owe data -->
+      <h2>Owed: ${{ owed }}</h2>
+      <!-- Placeholder for owed data -->
+      <a href="add-split.html" class="btn btn-full-width">Add Split</a>
+    </div>
+    <div class="flex-column flex-grow">
+      <h2>Recent Splits</h2>
+      <!-- Placeholder for recent splits -->
+      <a href="detailed-splits.html" class="btn btn-full-width">Detailed Splits</a>
+    </div>
+  </div>
+
+  <!-- Budget Overview Section -->
+  <div class="card">
+    <h2>Budget Overview</h2>
+    <div class="budget-container">
+      <div class="budget-item">
+        <span>Total Budget:</span>
+        <span>${{tot_bud}}</span>
+      </div>
+      <div class="budget-item">
+        <span>Amount Spent:</span>
+        <span>${{tot_spe}}</span>
+      </div>
+      <div class="budget-item">
+        <span>Amount Remaining:</span>
+        <span>${{tot_rem}}</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress" style="width: {{tot_rat}}%;"></div>
+      </div>
+    </div>
+    <a href="track-budget.html" class="btn btn-full-width">Track Budget</a>
+  </div>
+
+  <!-- Insights Section -->
+  <div class="card">
+    <h2>My Insights</h2>
+    <!-- Placeholder for insights content -->
+    <a href="detailed-insights.html" class="btn btn-full-width">Detailed Insights</a>
+  </div>
+
+</div>
+
+
+
+<script>// Write JavaScript here</script></body>
