@@ -38,6 +38,7 @@ class Category(models.Model):
     class Meta:
         managed = False
         db_table = 'Category'
+    
 
 
 class Credentials(models.Model):
@@ -102,6 +103,8 @@ class User(models.Model):
     class Meta:
         managed = False
         db_table = 'User'
+    def __str__(self):
+        return self.email
 
 
 # class AuthGroup(models.Model):
