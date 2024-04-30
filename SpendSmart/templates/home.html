@@ -1,149 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spending Management App - Home</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .home-container {
-            background-color: #fff;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            max-width: 800px;
-            width: 100%;
-            overflow: auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            border-spacing: 0;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin: 20px auto;
-        }
-        th, td {
-            border: 1px solid #dee2e6;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f1f5f8;
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        tr:hover {
-            background-color: #e9ecef;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #ffffff;
-            margin: 10% auto;
-            padding: 20px;
-            border: 1px solid #ced4da;
-            width: 80%;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .close {
-            color: #6c757d;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close:hover,
-        .close:focus {
-            color: #343a40;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div class="home-container">
-        <h2>All Transactions</h2>
-        <table id="transactionsTable">
-            <thead>
-                <tr>
-                    <!-- <th>Transaction ID</th> -->
-                    <th>Title</th>
-                    <th>Time</th>
-                    <th>Amount</th>
-                    <!-- <th>Note</th> -->
-                    <th>Payment Method</th>
-                    <th>Type</th>
-                    <th>Category</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for txn in txns %}
-                <tr class="transactionRow">
-                    <!-- <td>{{ txn.0 }} </td> -->
-                    <td>{{ txn.1 }}</td>
-                    <td>{{ txn.2 }}</td>
-                    <td>{{ txn.3 }}</td>
-                    <!-- <td>{{ txn.4 }}</td> -->
-                    <td>{{ txn.5 }}</td>
-                    <td>{{ txn.6 }}</td>
-                    <td>{{ txn.7 }}</td>
-                </tr>
-                {% endfor %}
-                <!-- Add more transaction rows dynamically here -->
-            </tbody>
-        </table>
-        <!-- Modal -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p>Transaction details will be displayed here.</p>
-        </div>
-    </div>
-    </div>
+{% extends 'base.html' %}
 
-    <script>
-        var modal = document.getElementById("myModal");
-        var span = document.getElementsByClassName("close")[0];
-        var rows = document.getElementsByClassName("transactionRow");
+{% block title %}Home{% endblock %}
 
-        for (var i = 0; i < rows.length; i++) {
-            rows[i].addEventListener("click", function() {
-                modal.style.display = "block";
-            });
-        }
-
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-    </script>
-</body>
-</html>
+{% block content %}
+<h1>Welcome home</h1>
+{{transactions}}
+<h1>Transaction List</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions %}
+            <tr>
+                <td>{{ transaction.0 }}</td>
+                <td>{{ transaction.1 }}</td>
+                <td>{{ transaction.2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

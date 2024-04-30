@@ -11,24 +11,34 @@ def index(request):
     c = request.COOKIES.get('id')
     if c is None:
         print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
     else:
         print("COOKIE + ", c)
-    return render(request,"index.html", {'user': { 'is_authenticated': False}})
+        return redirect('home')
 
 def login(request):
-    print("KHVV")
-    
-    context = {}
+    if request.method == 'GET':
+        return redirect('index')
     cur = connections['default'].cursor()
+    c = request.COOKIES.get('id')
+    # if c is not None:
+    #     return redirect('home')
+    # else:
+    #     print("COOKIE + ", c)
+    #     return redirect('home1')
     email = request.POST.get("username")
     password = request.POST.get("password")
     p =None
     if cur.execute("SELECT * from Credentials WHERE email = \'{}\'".format(email)):
         u,p = cur.fetchall()[0]
     if p!=password:
-        return render(request,"index.html")
+        return render(request,"index.html", {'alert_type':'danger', 'alert_message':"Login Failed"})
     cur.execute("SELECT userid FROM User WHERE email = \'{}\'".format(email))
     id = cur.fetchall()[0][0]
+    
+    
+    context = {}
+    print("ID = ",c)
     # id = request.GET.get(id)
 
     cur.execute("""SELECT SUM(amount) AS Income 
@@ -92,50 +102,43 @@ def login(request):
     context["txns"] = txns
 
     cur.close()
-    
-    response =  render(request,"home1.html",context)
+    context['user'] = { 'is_authenticated': True}
+    response =  redirect("home")
     response.set_cookie("id", id)
     return response
 
 def home(request):
-    if request.method == 'POST':
-        print("its posr")
-    cur = connections['default'].cursor()
-    form = AuthenticationForm(request, request.POST)
-    email = form.cleaned_data.get('username')
-    password = form.cleaned_data.get('password')
-    p =None
-    if cur.execute("SELECT * from Credentials WHERE email = \'{}\'".format(email)):
-        u,p = cur.fetchall()[0]
-    if p!=password:
-        return render(request,"index.html")
-    cur.execute("SELECT userid FROM User WHERE email = \'{}\'".format(email))
-    id = cur.fetchall()[0][0]
-
-    
-
-    cur.execute("SELECT txnId,title,timestamp,amount,note,paymentMethod,type,categoryName FROM Transaction T JOIN Category C ON T.categoryId = C.categoryId WHERE T.userId = {}".format(id))
-    data = cur.fetchall()
-
-    print(len(data))
-    context = {'txns':data}
-    cur.close()
-
+    c = request.COOKIES.get('id')
+    if c is None:
+        print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
+    context = {'user': { 'is_authenticated': True}}
+    id = c
+    transactions = getAllTransactionsForUser(id)
+    print(transactions)
+    context["transactions"] = transactions
     return render(request,"home.html",context)
 
 def home1(request):
+    c = request.COOKIES.get('id')
+    if c is None:
+        print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
+    else:
+        print("COOKIE + ", c)
+        id = c
     print(request)
     context = {}
     cur = connections['default'].cursor()
-    email = request.POST.get("email")
-    password = request.POST.get("password")
-    p =None
-    if cur.execute("SELECT * from Credentials WHERE email = \'{}\'".format(email)):
-        u,p = cur.fetchall()[0]
-    if p!=password:
-        return render(request,"index.html")
-    cur.execute("SELECT userid FROM User WHERE email = \'{}\'".format(email))
-    id = request.GET.get("id")
+    # email = request.POST.get("email")
+    # password = request.POST.get("password")
+    # p =None
+    # if cur.execute("SELECT * from Credentials WHERE email = \'{}\'".format(email)):
+    #     u,p = cur.fetchall()[0]
+    # if p!=password:
+    #     return render(request,"index.html")
+    # cur.execute("SELECT userid FROM User WHERE email = \'{}\'".format(email))
+    # id = request.GET.get("id")
     # id = request.GET.get(id)
 
     cur.execute("""SELECT SUM(amount) AS Income 
@@ -204,3 +207,31 @@ def home1(request):
 
 def register(request):
     return render(request,"register.html",)
+
+def logout(request):
+    response = render(request,"index.html", {'user': { 'is_authenticated': False}})
+    
+    # Clear session cookies
+    if request.session:
+        request.session.flush()
+    
+    # Clear any other cookies you may have set
+    response.delete_cookie('id')
+    
+    # Redirect to a different page after logout
+    return response
+
+
+def getAllTransactionsForUser(id):
+    if id is None:
+        return []
+    else:
+        cur = connections['default'].cursor()
+        cur.execute("""SELECT title,timestamp,amount
+                   FROM Transaction
+                   WHERE userId = {}
+                   ORDER BY timestamp DESC
+                   LIMIT 5;
+                   """.format(id,id))
+        txns = cur.fetchall() 
+        return txns
