@@ -201,3 +201,6 @@ def home1(request):
     cur.close()
 
     return render(request,"home1.html",context)
+
+def register(request):
+    return render(request,"register.html",)

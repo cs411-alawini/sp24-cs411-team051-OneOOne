@@ -30,6 +30,7 @@
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
         <button type="submit" class="btn btn-primary">Login</button>
+        <button formaction = "{% url 'register' %}" class="btn btn-primary" formnovalidate>Register</button>
     </form>
 </div>
 {% endblock %}
