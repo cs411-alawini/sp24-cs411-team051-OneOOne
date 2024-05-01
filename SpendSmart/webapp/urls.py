@@ -13,5 +13,10 @@ urlpatterns = [
     path("submitTransaction",views.submitTransaction,name="submitTransaction"),
     path("budget",views.budget,name="budget"),
     path("submitBudget",views.submitBudget,name="submitBudget"),
-    path("splits",views.splits,name="splits")
+    path("splits",views.splits,name="splits"),
+    path("get-users",views.get_users,name="get-users"),
+    path("search-user",views.search_user,name="search-user"),
+    path("add-split",views.add_split,name="add-split"),
+    path("pay",views.pay,name="pay"),
+    path("createUser",views.createUser,name="createUser"),
 ]

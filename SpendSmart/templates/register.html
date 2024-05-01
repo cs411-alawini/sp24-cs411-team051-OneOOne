@@ -19,7 +19,7 @@
 {% endif %}
 <div class="container mt-5">
     <h2 class="mb-4">Register</h2>
-    <form method="post" action="{% url 'login' %}">
+    <form method="post" action="{% url 'createUser' %}">
         {% csrf_token %}
         <div class="form-group">
             <label for="username">Username:</label>
@@ -43,7 +43,7 @@
         </div>
         <div class="form-group">
             <label for="password">Confirm Password:</label>
-            <input type="password" class="form-control" id="password" name="password" required>
+            <input type="password" class="form-control" id="password" name="cpassword" required>
         </div>
         <button type="submit" class="btn btn-primary">Register</button>
     </form>

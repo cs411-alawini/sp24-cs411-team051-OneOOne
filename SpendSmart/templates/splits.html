@@ -68,143 +68,361 @@
         <div class="col-md-8">
             <!-- First vertical division -->
             <div class="container table-responsive">
-                <div class="home-container">
-                    <h2>Budgets</h2>
-                    <div class="container mt-5">
-                        <form method="post" action="{% url 'budget' %}">
-                            {% csrf_token %}
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="year">Year:</label>
-                                        <input type="number" class="form-control" id="year" name="year" required>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6">
-                                    <div class="form-group">
-                                        <label for="month">Month:</label>
-                                        <input type="number" class="form-control" id="month" name="month" required>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-primary">Filter</button>
-                            </div>
-                        </form>
-                    </div>
+                    <h2>Borrowed</h2>
                     <table>
                         <thead>
+                            
                             <tr>
 
-                                <th>Category</th>
+                                <th>Username</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
                                 <th>Amount</th>
-                                <th>Expense</th>
-                                <th>Remaining Budget</th>
-
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for i in data %}
+                            {% for i in borrowed_data %}
                             <tr class="transactionRow">
 
-                                <td>{{ i.0 }}</td>
                                 <td>{{ i.1 }}</td>
+                                <td>{{ i.2 }}</td>
                                 <td>{{ i.3 }}</td>
                                 <td>{{ i.4 }}</td>
+                                <td><form id = "form1" method="post" action="{% url 'pay' %}">
+                                    {% csrf_token %}
+                                        <input hidden id="splitId" name = "splitId" value={{i.5}}></input>
+                                        <button type="submit" class="btn btn-primary">Pay</button>
+                                    </form>
+                                </td>
                             </tr>
                             {% endfor %}
 
                         </tbody>
                     </table>
-                </div>
+                    <h2>Owed</h2>
+                    <table>
+                        <thead>
+                            
+                            <tr>
+
+                                <th>Username</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Amount</th>
+    
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in owed_data %}
+                            <tr class="transactionRow">
+                                <td>{{ i.1 }}</td>
+                                <td>{{ i.2 }}</td>
+                                <td>{{ i.3 }}</td>
+                                <td>{{ i.4 }}</td>
+
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
               </div>
         </div>
         <div class="col-md-4">
             <!-- Second vertical division -->
             <div class="container">
-                <h2 class="mt-5 mb-4">Expense Form</h2>
-            
-                <form id="expenseForm" method="post" action="{% url 'submitBudget' %}">
+                <h2 class="mt-5 mb-4">Add Split</h2>
+                <form id="billForm" autocomplete="off">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="description" class="form-label">Description:</label>
-                        <input type="text" class="form-control" id="description" name="description" required>
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" required>
                     </div>
-            
                     <div class="mb-3">
-                        <label for="amount" class="form-label">Amount:</label>
-                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
-                    </div>
-            
-                    <div class="mb-3">
-                        <label for="date" class="form-label">Date:</label>
-                        <input type="date" class="form-control" id="date" name="date" required>
-                    </div>
-            
-            
-                    <div class="mb-3">
-                        <label for="category" class="form-label">Category:</label>
-                        <select class="form-select" id="category" name="category" required>
-                            <option value="">Select a category...</option>
-                            {% for id, value in parentCategories %}
-                                <option value="{{ id }}">{{ value }}</option>
-                            {% endfor %}
-                        </select>
+                    <label for="note">Note:</label>
+                    <textarea id="note" name="note" rows="4"></textarea>
                     </div>
 
                     <div class="mb-3">
-                        <label for="category" class="form-label">Sub-category:</label>
-                        <select class="form-select" id="sub-category" name="sub-category">
-                            <option value="">Select a subcategory...</option>
-                        </select>
+                    <label for="billAmount">Total Bill Amount:</label>
+                    <input type="number" id="billAmount" name="billAmount" step="0.01" required>
                     </div>
 
-            
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <div class="mb-3">
+                    <label for="myAmount">My Owed Amount:</label>
+                    <input type="number" id="myAmount" name="myAmount" step="0.01" value="0" required>
+                    </div>
+                
+                    <div class="mb-3">
+                    <div id="usersContainer">
+                        <div class="user-container">
+                            <div class="autocomplete">
+                                <input type="text" class="user" name="user[]" placeholder="User" required>
+                                <div class="autocomplete-items"></div>
+                            </div>
+                            <input type="number" class="user-amount" name="userAmount[]" step="0.01" placeholder="Amount Owed" required>
+                            <button type="button" class="removeUser">Remove</button>
+                        </div>
+                    </div>
+                    </div>
+                
+                    <button type="button" class="btn btn-primary" id="addUser">Add User</button>
+                    <button type="button" class="btn btn-primary" id="splitEqually">Split Equally</button>
+                    <button type="button" class="btn btn-primary" id="split">Split</button>
                 </form>
             </div>
         </div>
+
         <script>
-            // Get references to both dropdowns
-            var dropdown1 = document.getElementById('category');
-            var dropdown2 = document.getElementById('sub-category');
-        
-            // Define options for each category
-            var categoryOptions = JSON.parse('{{grouupedCategories|escapejs}}')
-            console.log(categoryOptions);
-        
-            // Function to populate dropdown2 based on the selected value in dropdown1
-            function populateDropdown2() {
-                // Clear existing options in dropdown2
-                dropdown2.innerHTML = '';
-        
-                // Get the selected category from dropdown1
-                var selectedCategory = dropdown1.value;
-                var emptyOption = document.createElement('option');
-                emptyOption.value = ''; // Set the value of the option
-                emptyOption.textContent = 'Select an option...'; // Set the text content of the option
-        
-                // Append the empty default option to the select element
-                dropdown2.appendChild(emptyOption);
-        
-                if(selectedCategory!=""){
-                    // Get the options for the selected category
-                    var options = categoryOptions[selectedCategory];
-        
-                    // Populate dropdown2 with options for the selected category
-                    options.forEach(function(option) {
-                        var optionElement = document.createElement('option');
-                        optionElement.textContent = option[1];
-                        optionElement.value = option[0];
-                        dropdown2.appendChild(optionElement);
-                    });
+            function autocomplete(input, arr) {
+                var currentFocus;
+                input.addEventListener("input", function(e) {
+                    var val = this.value;
+                    closeAllLists();
+                    if (!val) { return false;}
+                    currentFocus = -1;
+                    var a = document.createElement("div");
+                    a.setAttribute("id", this.id + "autocomplete-list");
+                    a.setAttribute("class", "autocomplete-items");
+                    this.parentNode.appendChild(a);
+                    for (var i = 0; i < arr.length; i++) {
+                        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+                            var b = document.createElement("div");
+                            b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                            b.innerHTML += arr[i].substr(val.length);
+                            b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+                            b.addEventListener("click", function(e) {
+                                input.value = this.getElementsByTagName("input")[0].value;
+                                closeAllLists();
+                            });
+                            a.appendChild(b);
+                        }
+                    }
+                });
+                input.addEventListener("keydown", function(e) {
+                    var x = document.getElementById(this.id + "autocomplete-list");
+                    if (x) x = x.getElementsByTagName("div");
+                    if (e.keyCode == 40) {
+                        currentFocus++;
+                        addActive(x);
+                    } else if (e.keyCode == 38) {
+                        currentFocus--;
+                        addActive(x);
+                    } else if (e.keyCode == 13) {
+                        e.preventDefault();
+                        if (currentFocus > -1) {
+                            if (x) x[currentFocus].click();
+                        }
+                    }
+                });
+                function addActive(x) {
+                    if (!x) return false;
+                    removeActive(x);
+                    if (currentFocus >= x.length) currentFocus = 0;
+                    if (currentFocus < 0) currentFocus = (x.length - 1);
+                    x[currentFocus].classList.add("autocomplete-active");
                 }
+                function removeActive(x) {
+                    for (var i = 0; i < x.length; i++) {
+                        x[i].classList.remove("autocomplete-active");
+                    }
+                }
+                function closeAllLists(elmnt) {
+                    var x = document.getElementsByClassName("autocomplete-items");
+                    for (var i = 0; i < x.length; i++) {
+                        if (elmnt != x[i] && elmnt != input) {
+                            x[i].parentNode.removeChild(x[i]);
+                        }
+                    }
+                }
+                document.addEventListener("click", function (e) {
+                    closeAllLists(e.target);
+                });
             }
         
-            // Populate dropdown2 initially
-            populateDropdown2();
+            document.getElementById('addUser').addEventListener('click', function() {
+                var container = document.getElementById('usersContainer');
+                var userInputs = document.querySelectorAll('.user');
+                var newUserInput = userInputs[userInputs.length - 1];
+                if (newUserInput.value.trim() === '') {
+                    alert('User field cannot be empty!');
+                    return;
+                }
+                var isDuplicate = false;
+                userInputs.forEach(function(input) {
+                    if (input !== newUserInput && input.value.trim() === newUserInput.value.trim()) {
+                        isDuplicate = true;
+                    }
+                });
+                if (isDuplicate) {
+                    alert('User already exists!');
+                    return;
+                }
+                var div = document.createElement('div');
+                div.className = 'user-container';
+                div.innerHTML = `
+                    <div class="autocomplete">
+                        <input type="text" class="user" name="user[]" placeholder="User" required>
+                        <div class="autocomplete-items"></div>
+                    </div>
+                    <input type="number" class="user-amount" name="userAmount[]" step="0.01" placeholder="Amount Owed" required>
+                    <button type="button" class="removeUser">Remove</button>
+                `;
+                container.appendChild(div);
+                fetchUserData(div.querySelector('.user')); // Fetch user data for the new input field
+            });
         
-            // Add event listener to dropdown1 to update dropdown2 when selection changes
-            dropdown1.addEventListener('change', populateDropdown2);
+            document.getElementById('splitEqually').addEventListener('click', function() {
+                var billAmount = parseFloat(document.getElementById('billAmount').value);
+                var myAmount = parseFloat(document.getElementById('myAmount').value);
+                var userAmounts = document.querySelectorAll('.user-amount');
+                var totalUserAmount = 0;
+                for (var i = 0; i < userAmounts.length; i++) {
+                    totalUserAmount += parseFloat(userAmounts[i].value);
+                }
+                var totalAmount = myAmount + totalUserAmount;
+        
+                // if (totalAmount !== billAmount) {
+                //     alert('Total owed amount does not match bill amount!');
+                //     return;
+                // }
+        
+                var equalAmount = billAmount / (userAmounts.length + 1); // including myself
+                document.getElementById('myAmount').value = equalAmount.toFixed(2);
+                for (var i = 0; i < userAmounts.length; i++) {
+                    userAmounts[i].value = equalAmount.toFixed(2);
+                }
+            });
+        
+            document.getElementById('split').addEventListener('click', function() {
+                // Check if title is empty
+                var title = document.getElementById('title').value.trim();
+                if (!title) {
+                    alert('Title cannot be empty!');
+                    return;
+                }
+        
+                // Check if any amount is empty or negative
+                var userAmountInputs = document.querySelectorAll('.user-amount');
+                for (var i = 0; i < userAmountInputs.length; i++) {
+                    var amount = parseFloat(userAmountInputs[i].value);
+                    if (isNaN(amount) || amount < 0) {
+                        alert('Amounts must be non-negative numbers!');
+                        return;
+                    }
+                }
+                
+                // Check if any user field is empty
+                var userInputs = document.querySelectorAll('.user');
+                for (var i = 0; i < userInputs.length; i++) {
+                    if (userInputs[i].value.trim() === '') {
+                        alert('User field cannot be empty!');
+                        return;
+                    }
+                }
+        
+                var billAmount = parseFloat(document.getElementById('billAmount').value);
+                var myAmount = parseFloat(document.getElementById('myAmount').value);
+                var userAmounts = document.querySelectorAll('.user-amount');
+                var totalUserAmount = 0;
+                for (var i = 0; i < userAmounts.length; i++) {
+                    totalUserAmount += parseFloat(userAmounts[i].value);
+                }
+                var totalAmount = myAmount + totalUserAmount;
+        
+                if (Math.abs(totalAmount - billAmount) <= 0.5) {
+                    alert('Total owed amount does not match bill amount!');
+                    return;
+                }
+        
+                // Fetch user data
+                var users = document.querySelectorAll('.user');
+                var userData = [];
+                var endpoint = '/search-user'; // Replace with your Django endpoint
+                Promise.all(Array.from(users).map(user => {
+                    return fetch(endpoint + '?user=' + encodeURIComponent(user.value.trim()))
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.exists) {
+                                userData.push(user.value.trim());
+                            } else {
+                                alert('User ' + user.value.trim() + ' does not exist!');
+                                throw new Error('User does not exist');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error fetching user data:', error);
+                            return Promise.reject(error);
+                        });
+                })).then(() => {
+                    // Store form inputs
+                    var formData = {
+                        title: title,
+                        note: document.getElementById('note').value,
+                        billAmount: document.getElementById('billAmount').value,
+                        myAmount: document.getElementById('myAmount').value,
+                        users: [],
+                        userAmounts: []
+                    };
+                    for (var i = 0; i < userInputs.length; i++) {
+                        formData.users.push(userInputs[i].value);
+                        formData.userAmounts.push(userAmountInputs[i].value);
+                    }
+                    // Display alert
+                    // alert('Split has been added.');
+        
+                    // // Redirect to another page
+                    // window.location.href = 'another-page.html';
+        
+                    fetch('/add-split', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Handle successful response
+                        alert('Data has been submitted successfully.');
+                        window.location.href = '/home'; // Redirect to another page
+                    })
+                    .catch(error => {
+                        // Handle errors
+                        console.error('Error:', error);
+                        alert('There was an error submitting the data.');
+                    });
+        
+                    });
+            });
+        
+            document.getElementById('usersContainer').addEventListener('click', function(event) {
+                if (event.target.classList.contains('removeUser')) {
+                    event.target.parentNode.remove();
+                }
+            });
+        
+            function fetchUserData(input) {
+                var endpoint = '/get-users'; // Replace with your Django endpoint
+                fetch(endpoint)
+                    .then(response => response.json())
+                    .then(data => {
+                        autocomplete(input, data.users); // Assuming the response has a key 'users' containing an array of user names
+                    })
+                    .catch(error => {
+                        console.error('Error fetching user data:', error);
+                    });
+            }
+        
+            // Apply autocomplete to the initial user input field
+            var initialUserInput = document.querySelector('.user');
+            fetchUserData(initialUserInput);
+        
         </script>
+        
 {% endblock %}

@@ -7,6 +7,9 @@ import plotly.express as px
 import pandas as pd
 import calendar
 import json
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
 
 
 import datetime
@@ -45,67 +48,7 @@ def login(request):
     
     context = {}
     # print("ID = ",c)
-    # id = request.GET.get(id)
-
-    cur.execute("""SELECT SUM(amount) AS Income 
-                   FROM Transaction
-                   WHERE userId = {} AND type = 'income' AND YEAR(timestamp) = YEAR(CURRENT_DATE()) AND Month(timestamp) = MONTH(CURRENT_DATE());
-                   """.format(id))
-    inflow = cur.fetchall()[0][0]
-
-    cur.execute("""SELECT SUM(amount) AS Expense 
-                   FROM Transaction
-                   WHERE userId = {} AND type = 'expense' AND YEAR(timestamp) = YEAR(CURRENT_DATE()) AND Month(timestamp) = MONTH(CURRENT_DATE());
-                   """.format(id))
-    outflow = cur.fetchall()[0][0]
-
-    cur.execute("""SELECT SUM(amount) AS owes
-                   FROM Borrows
-                   WHERE Borrows.borrowerId = {} AND Borrows.isPaid = False;
-                   """.format(id))
-    owes = cur.fetchall()[0][0]
-    
-    cur.execute("""SELECT SUM(Borrows.amount) as owed
-                   FROM Split JOIN Borrows on Split.splitId = Borrows.splitId
-                   WHERE lenderId = {} AND isPaid = False;
-                   """.format(id))
-    owed = cur.fetchall()[0][0]
-
-    cur.execute("""SELECT SUM(amount)
-                   FROM MonthlyCategoryBudget
-                   WHERE userId = {} AND Year(month) = YEAR(CURRENT_DATE()) AND Month(month) = MONTH(CURRENT_DATE());
-                   """.format(id))
-    tot_bud = cur.fetchall()[0][0]
-
-    cur.execute("""SELECT SUM(amount) AS Expense
-                   FROM Transaction
-                   WHERE userId = {} AND type = 'expense' AND YEAR(timestamp) = YEAR(CURRENT_DATE()) AND Month(timestamp) = MONTH(CURRENT_DATE()) AND categoryId IN ( SELECT categoryId
-                                                                            FROM MonthlyCategoryBudget
-                                                                            WHERE userId = {} );
-
-                   """.format(id,id))
-    tot_spe = cur.fetchall()[0][0]    
-
-    cur.execute("""SELECT title,timestamp,amount
-                   FROM Transaction
-                   WHERE userId = {}
-                   ORDER BY timestamp DESC
-                   LIMIT 5;
-                   """.format(id,id))
-    txns = cur.fetchall() 
-    
-
-
-    tot_rem = tot_bud - tot_spe
-    context["inflow"] = inflow
-    context["outflow"] = outflow
-    context["owes"] = owes
-    context["owed"] = owed
-    context["tot_bud"] = tot_bud
-    context["tot_spe"] = tot_spe
-    context["tot_rem"] = tot_rem
-    context["tot_rat"] = (tot_spe / tot_bud) * 100
-    context["txns"] = txns
+    # id = request.GET.get(id
 
     cur.close()
     context['user'] = { 'is_authenticated': True}
@@ -460,4 +403,186 @@ def insertBudget( p_description, p_amount, p_date, p_categoryId, p_userId):
     return cur.fetchall()
 
 def splits(request):
-    return render(request,"splits.html")
+    cur = connections['default'].cursor()
+    c = request.COOKIES.get('id')
+    if c is None:
+        print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
+    context = {'user': { 'is_authenticated': True}}
+    id = c
+
+    query = '''SELECT Split.lenderId, User.userName, User.firstName, User.lastName, SUM(Borrows.amount) AS owed, Borrows.splitId
+            FROM Split JOIN User ON Split.lenderId = User.userId JOIN Borrows on Borrows.splitId = Split.splitId
+            WHERE Borrows.borrowerId = {} AND Borrows.isPaid = False AND Split.lenderId != {}
+            GROUP BY Split.lenderId, User.userName, User.firstName, User.lastName, Borrows.splitId;'''.format(id,id)
+    cur.execute(query)
+    borrowed_data = cur.fetchall()
+    context['borrowed_data'] = borrowed_data
+
+    query = '''SELECT  Borrows.borrowerId, User.userName, User.firstName, User.lastName, SUM(Borrows.amount) as Balance 
+            FROM (Split JOIN Borrows ON Split.splitId = Borrows.splitId) JOIN User ON Borrows.borrowerId = User.userId
+            WHERE Split.lenderId = {} AND Borrows.isPaid = False AND Borrows.borrowerId != {}
+            GROUP BY Borrows.borrowerId, User.userName, User.firstName, User.lastName;'''.format(id,id)
+    cur.execute(query)
+    owed_data = cur.fetchall()
+    context['owed_data'] = owed_data
+
+    
+    return render(request,"splits.html",context)
+
+
+@csrf_exempt
+def get_users(request):
+    id = request.COOKIES.get('id')
+    if id is None:
+        print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
+    else: 
+        # search_text = request.POST.get('user')
+        payload = []
+    
+        # if search_text:
+        cur = connections['default'].cursor()
+        cur.execute("""
+                        SELECT userName from User
+                        WHERE userId <> {} AND userName <> 'system'
+                        """.format(id))
+        results = cur.fetchall()
+        # results = [result[0] for result in results]
+        # context = {"results": results}
+        # return render(request, 'partials/search-result.html', context)
+
+        for result in results:
+            payload.append(result[0])
+                
+        return JsonResponse({
+            'status' : True,
+            'users' : payload
+        })
+
+
+@csrf_exempt 
+def search_user(request):
+    id = request.COOKIES.get('id')
+    if id is None:
+        print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
+    else: 
+        search_text = request.GET.get('user')
+        payload = []
+    
+        # if search_text:
+        cur = connections['default'].cursor()
+        cur.execute("""
+                        SELECT userName from User
+                        WHERE userName = '{}'
+                        """.format(search_text))
+        results = cur.fetchall()
+        
+        for result in results:
+            payload.append(result[0])
+                
+        if results:
+            return JsonResponse({
+                'exists' : True,
+                'status' : True,
+                'users' : payload
+            })
+        else:
+            return JsonResponse({
+                'exists' : False,
+                'status' : True,
+                'users' : payload
+            })
+
+@csrf_exempt            
+def add_split(request):
+    if request.method == 'GET':
+        return redirect("home")
+    else:
+        # print(request.body)
+        # data = json.loads(request.body)
+        # print(data)
+        try:
+            # Parse JSON data from request body
+            data = json.loads(request.body)
+            title = data['title']
+            note = data['note']
+            bill_amount = data['billAmount']
+            my_amount = data['myAmount']
+            users = data['users']
+            user_amounts = data['userAmounts']
+            
+            # Process the data as needed
+
+            return JsonResponse({'status': 'success', 'message': 'Form data received'})
+        except json.JSONDecodeError:
+            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
+
+def submitSplit(request):
+    # print("here")
+    if request.method == 'GET':
+        return redirect('')
+    else:
+        userId = getUserId(request)
+        if userId is None:
+            redirect('')
+        else: 
+            print(request.POST)
+            description = request.POST['description']
+            amount = request.POST['amount']
+            date = request.POST['date']
+            category = request.POST['category']
+            subcategory = request.POST['sub-category']
+            print(date)
+            print(amount)
+
+            # subcategory =  'NULL'
+            description = "'"+ description + "'"
+            date = "'" + date + "'"
+            insertBudget(description,amount,date,category,userId)
+            return redirect('budget')
+
+def pay(request):
+    if request.method == 'GET':
+        return redirect('')
+    else:
+        userId = getUserId(request)
+        if userId is None:
+            redirect('')
+        else: 
+            print(request.POST)
+            cur = connections['default'].cursor()
+            splitId = request.POST['splitId']
+
+            query = '''UPDATE Borrows SET isPaid = 1 WHERE SplitId = {} and borrowerId = {};'''.format(splitId,userId)
+            cur = connections['default'].cursor()
+            cur.execute(query)
+            cur.close()
+            return redirect('splits')
+
+def createUser(request):
+    if request.method == 'GET':
+        return redirect('index')
+    else:
+        print(request.POST)
+        cur = connections['default'].cursor()
+        username = request.POST['username']
+        fname = request.POST['firstname']
+        lname = request.POST['lastname']
+        email = request.POST['email']
+        pwd = request.POST['password']
+        cpwd = request.POST['username']
+        context = {}
+        # if cpwd != pwd:
+        #     context['alert_type'] = 'warning'
+        #     context['alert_message'] = "Passwords do not match!"
+        #     return redirect('register')
+        query = '''INSERT INTO Credentials (email,password) VALUE (\'{}\',\'{}\')
+                '''.format(email,pwd)
+        cur.execute(query)
+        query = '''INSERT INTO User (userName,firstName,lastName,email) VALUE (\'{}\',\'{}\',\'{}\',\'{}\')
+                   '''.format(username,fname,lname,email)
+        cur.execute(query)
+        return redirect('index')
+    return redirect('')
