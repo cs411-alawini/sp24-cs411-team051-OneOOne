@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome home</h1>
+<style>
+    .table-responsive {
+    max-height:800px;
+}
+</style>
+<div>
+    <div class="row">
+        <div class="col-md-8">
+            <!-- First vertical division -->
+            <div class="container table-responsive">
+                <h2>All transactions</h2>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                  <tbody class="">
+                    {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.0 }}</td>
+                            <td>{{ transaction.1|date:"Y-m-d"  }}</td>
+                            <td>{{ transaction.2 }}</td>
+                        </tr>
+                        {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+        </div>
+        <div class="col-md-4">
+            <!-- Second vertical division -->
+            <div class="container">
+                <h2 class="mt-5 mb-4">Expense Form</h2>
+            
+                <form id="expenseForm" method="post" action="{% url 'submitTransaction' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description:</label>
+                        <input type="text" class="form-control" id="description" name="description">
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount:</label>
+                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date:</label>
+                        <input type="date" class="form-control" id="date" name="date">
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="type" class="form-label">Type:</label>
+                        <select class="form-select" id="type" name="type" required>
+                            <option value="Income">Income</option>
+                            <option value="Expense">Expense</option>
+                        </select>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category:</label>
+                        <select class="form-select" id="category" name="category" >
+                            <option value="">Select a category...</option>
+                            {% for id, value in parentCategories %}
+                                <option value="{{ id }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Sub-category:</label>
+                        <select class="form-select" id="sub-category" name="sub-category">
+                            <option value="">Select a subcategory...</option>
+                        </select>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="note" class="form-label">Note:</label>
+                        <textarea class="form-control" id="note" name="note" rows="4"></textarea>
+                    </div>
+            
+                    <div class="mb-3">
+                        <label for="paymentMethod" class="form-label">Payment Method:</label>
+                        <select class="form-select" id="paymentMethod" name="paymentMethod" required>
+                            <option value="Cash">Cash</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Debit Card">Debit Card</option>
+                            <option value="Zelle">Zelle</option>
+                            <!-- Add more payment methods as needed -->
+                        </select>
+                    </div>
+            
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get references to both dropdowns
+    var dropdown1 = document.getElementById('category');
+    var dropdown2 = document.getElementById('sub-category');
+
+    // Define options for each category
+    var categoryOptions = JSON.parse('{{grouupedCategories|escapejs}}')
+    console.log(categoryOptions);
+
+    // Function to populate dropdown2 based on the selected value in dropdown1
+    function populateDropdown2() {
+        // Clear existing options in dropdown2
+        dropdown2.innerHTML = '';
+
+        // Get the selected category from dropdown1
+        var selectedCategory = dropdown1.value;
+        var emptyOption = document.createElement('option');
+        emptyOption.value = ''; // Set the value of the option
+        emptyOption.textContent = 'Select an option...'; // Set the text content of the option
+
+        // Append the empty default option to the select element
+        dropdown2.appendChild(emptyOption);
+
+        if(selectedCategory!=""){
+            // Get the options for the selected category
+            var options = categoryOptions[selectedCategory];
+
+            // Populate dropdown2 with options for the selected category
+            options.forEach(function(option) {
+                var optionElement = document.createElement('option');
+                optionElement.textContent = option[1];
+                optionElement.value = option[0];
+                dropdown2.appendChild(optionElement);
+            });
+        }
+    }
+
+    // Populate dropdown2 initially
+    populateDropdown2();
+
+    // Add event listener to dropdown1 to update dropdown2 when selection changes
+    dropdown1.addEventListener('change', populateDropdown2);
+</script>
+
+
+
+  <!-- <script>
+    document.getElementById('expenseForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent form submission
+
+        // Retrieve form data
+        var formData = new FormData(this);
+
+        // Convert form data to JSON object
+        var jsonData = {};
+        formData.forEach(function(value, key) {
+            jsonData[key] = value;
+        });
+
+        // Display form data (you can send it to backend for processing)
+        console.log(jsonData);
+
+        // Clear form inputs (optional)
+        this.reset();
+    });
+</script> -->
+{% endblock %}

@@ -122,12 +122,13 @@ BEGIN
         c.categoryId,
         c.categoryName,
         SUM(t.amount) AS monthly_expense
+        coalesce(c.parentCategoryId, c.categoryId) as parentId
     FROM 
         Transaction t
     JOIN 
         Category c ON t.categoryId = c.categoryId
     WHERE 
-        t.userId = userId
+        t.userId = 1
     GROUP BY 
         YEAR(t.timestamp),
         MONTH(t.timestamp),
@@ -139,3 +140,30 @@ BEGIN
 END //
 
 DELIMITER ;
+
+
+select coalesce(parentCategoryId, categoryId) as id from Category limit 15;
+
+
+
+with categoryExpense as (with temp as (SELECT 
+        t.timestamp,
+        c.categoryId,
+        c.parentCategoryId,
+        c.categoryName,
+        t.amount
+        -- coalesce(parentCategoryId, categoryId) as parentId
+        -- SELECT *
+    FROM 
+        Transaction t
+    JOIN 
+        Category c ON t.categoryId = c.categoryId
+    WHERE 
+        t.userId = 111)
+
+        select coalesce(temp.parentCategoryId, temp.categoryId) as id,
+            amount,
+            timestamp, 
+            temp.categoryName
+            from temp join Category on temp.id = Category.categoryId;)
+

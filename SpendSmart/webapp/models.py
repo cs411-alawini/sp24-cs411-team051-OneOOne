@@ -105,7 +105,72 @@ class User(models.Model):
         db_table = 'User'
     def __str__(self):
         return self.email
+    
+# models.py
 
+from django.db import models
+
+class Expense(models.Model):
+    TYPE_CHOICES = (
+        ('income', 'Income'),
+        ('expense', 'Expense'),
+    )
+
+    CATEGORY_CHOICES = (
+        ('category1', 'Category 1'),
+        ('category2', 'Category 2'),
+        # Add more categories as needed
+    )
+
+    PAYMENT_METHOD_CHOICES = (
+        ('cash', 'Cash'),
+        ('credit_card', 'Credit Card'),
+        ('debit_card', 'Debit Card'),
+        ('bank_transfer', 'Bank Transfer'),
+        # Add more payment methods as needed
+    )
+
+    description = models.TextField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    date = models.DateField()
+    type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    note = models.TextField(blank=True)
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES)
+
+    def __str__(self):
+        return self.description
+
+# class Expense(models.Model):
+#     TYPE_CHOICES = (
+#         ('income', 'Income'),
+#         ('expense', 'Expense'),
+#     )
+
+#     CATEGORY_CHOICES = (
+#         ('category1', 'Category 1'),
+#         ('category2', 'Category 2'),
+#         # Add more categories as needed
+#     )
+
+#     PAYMENT_METHOD_CHOICES = (
+#         ('cash', 'Cash'),
+#         ('credit_card', 'Credit Card'),
+#         ('debit_card', 'Debit Card'),
+#         ('bank_transfer', 'Bank Transfer'),
+#         # Add more payment methods as needed
+#     )
+
+#     description = models.TextField()
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     date = models.DateField()
+#     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+#     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+#     note = models.TextField(blank=True)
+#     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES)
+
+#     def __str__(self):
+#         return self.description
 
 # class AuthGroup(models.Model):
 #     name = models.CharField(unique=True, max_length=150)
@@ -219,3 +284,6 @@ class User(models.Model):
 #     class Meta:
 #         managed = False
 #         db_table = 'django_session'
+
+
+

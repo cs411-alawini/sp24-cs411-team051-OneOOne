@@ -6,16 +6,19 @@ from django.contrib.auth.forms import AuthenticationForm
 import plotly.express as px
 import pandas as pd
 import calendar
+import json
+
+
 
 # Create your views here.
 def index(request):
-    print(request)
+    # print(request)
     c = request.COOKIES.get('id')
     if c is None:
-        print("COOKIES IS NON")
+        # print("COOKIES IS NON")
         return render(request,"index.html", {'user': { 'is_authenticated': False}})
     else:
-        print("COOKIE + ", c)
+        # print("COOKIE + ", c)
         return redirect('home')
 
 def login(request):
@@ -40,7 +43,7 @@ def login(request):
     
     
     context = {}
-    print("ID = ",c)
+    # print("ID = ",c)
     # id = request.GET.get(id)
 
     cur.execute("""SELECT SUM(amount) AS Income 
@@ -112,24 +115,24 @@ def login(request):
 def home(request):
     c = request.COOKIES.get('id')
     if c is None:
-        print("COOKIES IS NON")
+        # print("COOKIES IS NON")
         return render(request,"index.html", {'user': { 'is_authenticated': False}})
     context = {'user': { 'is_authenticated': True}}
     id = c
     transactions = getAllTransactionsForUser(id)
-    print(transactions)
+    # print(transactions)
     context["transactions"] = transactions
     return render(request,"home.html",context)
 
 def home1(request):
     c = request.COOKIES.get('id')
     if c is None:
-        print("COOKIES IS NON")
+        # print("COOKIES IS NON")
         return render(request,"index.html", {'user': { 'is_authenticated': False}})
     else:
-        print("COOKIE + ", c)
+        # print("COOKIE + ", c)
         id = c
-    print(request)
+    # print(request)
     context = {}
     cur = connections['default'].cursor()
     # email = request.POST.get("email")
@@ -232,8 +235,7 @@ def getAllTransactionsForUser(id):
         cur.execute("""SELECT title,timestamp,amount
                    FROM Transaction
                    WHERE userId = {}
-                   ORDER BY timestamp DESC
-                   LIMIT 5;
+                   ORDER BY timestamp DESC;
                    """.format(id,id))
         txns = cur.fetchall() 
         return txns
@@ -280,3 +282,81 @@ def analysis(request):
     context['year2'] = year2
 
     return render(request,"analysis.html",context)
+    
+def transactions(request):
+    c = request.COOKIES.get('id')
+    if c is None:
+        # print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
+    context = {'user': { 'is_authenticated': True}}
+    id = c
+    transactions = getAllTransactionsForUser(id)
+    categories = getCategoriesForUser(id)
+    # print(categories)
+    parentCategories = [[tup[0], tup[1]] for tup in categories if tup[2] is None]
+    grouupedCategories = {}
+    for tup in categories:
+        if tup[2] not in grouupedCategories:
+            grouupedCategories[tup[2]] = []
+        grouupedCategories[tup[2]].append([tup[0], tup[1]])
+
+    # Convert the dictionary to a list of tuples
+    result = [(key, value) for key, value in grouupedCategories.items()]
+
+    # print(result)
+    # print(parentCategories)
+    # print(transactions)
+    context["transactions"] = transactions
+    context["parentCategories"] = parentCategories
+    context["grouupedCategories"] = json.dumps(grouupedCategories)
+    # context['user']
+    return render(request,"transactions.html",context)
+
+def submitTransaction(request):
+    # print("here")
+    if request.method == 'GET':
+        return redirect('')
+    else:
+        userId = getUserId(request)
+        if userId is None:
+            redirect('')
+        else: 
+            print("FOMRM")
+            print(request.POST)
+            description = request.POST['description']
+            amount = request.POST['amount']
+            date = request.POST['date']
+            type = request.POST['type']
+            category = request.POST['category']
+            subcategory = request.POST['sub-category']
+            note = request.POST['note']
+            paymentMethod = request.POST['paymentMethod']
+            print(date)
+            print(amount)
+            type = "'"+type+"'"
+            paymentMethod = "'"+paymentMethod+"'"
+            note = "'"+note+"'" if note != '' else 'NULL'
+            description = "'"+description+"'" if description != '' else 'NULL'
+            date = "'"+date+"'" if date != '' else 'NULL'
+            category = "'"+subcategory+"'" if subcategory != '' else "'"+category+"'" if category != '' else 'NULL'
+            # subcategory =  'NULL'
+            insertTransaction(description,amount,type,userId,category,note,paymentMethod,date)
+            return redirect('transactions')
+        
+
+def getUserId(request):
+    return request.COOKIES.get('id')
+     
+
+def getCategoriesForUser(userId):
+    cur = connections['default'].cursor()
+    cur.execute("""call GetCategories({});""".format(userId))
+    return cur.fetchall()
+    
+def insertTransaction( p_title, p_amount, p_type, p_userId, p_categoryId, p_note, p_paymentMethod, p_transactionDate):
+    cur = connections['default'].cursor()
+    query = """CALL InsertTransaction({}, {}, {}, {}, {}, {}, {}, {});""".format(p_title, p_amount, p_type, p_userId, p_categoryId, p_note, p_paymentMethod, p_transactionDate)
+    print(query)
+    cur.execute("""CALL InsertTransaction({}, {}, {}, {}, {}, {}, {}, {});"""
+                .format(p_title, p_amount, p_type, p_userId, p_categoryId, p_note, p_paymentMethod, p_transactionDate))
+    return cur.fetchall()
