@@ -230,7 +230,8 @@
         $('#date1').val(rowData[3]);
         $('#type1').val(rowData[5]);
         if(rowData[7]=='None'){
-            $('#category1').val(rowData[6]);
+            if(rowData[6]!='None'){
+            $('#category1').val(rowData[6]);}
         }
         else 
             $('#category1').val(rowData[7]);
