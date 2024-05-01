@@ -495,30 +495,6 @@ def search_user(request):
                 'users' : payload
             })
 
-@csrf_exempt            
-def add_split(request):
-    if request.method == 'GET':
-        return redirect("home")
-    else:
-        # print(request.body)
-        # data = json.loads(request.body)
-        # print(data)
-        try:
-            # Parse JSON data from request body
-            data = json.loads(request.body)
-            title = data['title']
-            note = data['note']
-            bill_amount = data['billAmount']
-            my_amount = data['myAmount']
-            users = data['users']
-            user_amounts = data['userAmounts']
-            
-            # Process the data as needed
-
-            return JsonResponse({'status': 'success', 'message': 'Form data received'})
-        except json.JSONDecodeError:
-            return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)
-
 def submitSplit(request):
     # print("here")
     if request.method == 'GET':
@@ -586,3 +562,73 @@ def createUser(request):
         cur.execute(query)
         return redirect('index')
     return redirect('')
+
+def get_user_id(user_name):
+    cur = connections['default'].cursor()
+    cur.execute("""
+                SELECT userId from User
+                WHERE userName = '{}'; 
+                """.format(user_name))
+
+    return cur.fetchall()[0][0]    
+
+@csrf_exempt            
+def add_split(request):
+    id = request.COOKIES.get('id')
+    if id is None:
+        print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
+    else: 
+        if request.method == 'GET':
+            return redirect("home")
+        else:
+            # print(request.body)
+            # data = json.loads(request.body)
+            # print(data)
+            try:
+                # Parse JSON data from request body
+                data = json.loads(request.body)
+                title = data['title']
+                note = data['note']
+                bill_amount = data['billAmount']
+                my_amount = data['myAmount']
+                users = data['users']
+                user_amounts = data['userAmounts']
+                
+                # Process the data
+                transaction = \
+                f'''SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+                        START TRANSACTION;
+        
+                        INSERT INTO Split(title, amount, note, lenderId)
+                        VALUES ('{title}', {bill_amount}, '{note}', {id});
+                        SET @split_id = LAST_INSERT_ID();
+                        
+                        
+                        INSERT INTO Transaction(title, amount, note, type, userId, categoryId) 
+                        SELECT '{"Split: " + title}', {my_amount}, '{note}', '{'Expense'}', {id}, {31}
+                        FROM DUAL
+                        WHERE {my_amount} > 0;
+                        
+                        '''
+                
+                user_ids = [get_user_id(user) for user in users]
+                
+                for user, amount in zip(user_ids, user_amounts):
+                    transaction += \
+                    f'''INSERT INTO Borrows(borrowerId, splitId, Amount, isPaid)
+                        VALUES ({user}, @split_id, {amount}, {0});
+                                      
+                        '''
+                
+                transaction += \
+                    f'''COMMIT;'''
+                print(transaction)
+                
+                cur = connections['default'].cursor()
+                cur.execute(transaction)
+                
+                
+                return JsonResponse({'status': 'success', 'message': 'Form data received'})
+            except json.JSONDecodeError:
+                return JsonResponse({'status': 'error', 'message': 'Invalid JSON data'}, status=400)

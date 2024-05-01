@@ -330,7 +330,7 @@
                 }
                 var totalAmount = myAmount + totalUserAmount;
         
-                if (Math.abs(totalAmount - billAmount) <= 0.5) {
+                if (Math.abs(totalAmount - billAmount) >= 0.5) {
                     alert('Total owed amount does not match bill amount!');
                     return;
                 }
@@ -389,8 +389,8 @@
                     })
                     .then(data => {
                         // Handle successful response
-                        alert('Data has been submitted successfully.');
-                        window.location.href = '/home'; // Redirect to another page
+                        // alert('Data has been submitted successfully.');
+                        window.location.href = '/splits'; // Redirect to another page
                     })
                     .catch(error => {
                         // Handle errors
