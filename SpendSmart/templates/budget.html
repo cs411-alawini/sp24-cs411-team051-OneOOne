@@ -1,0 +1,112 @@
+<!-- home.html -->
+{% extends 'base.html' %}
+
+{% block title %}SpendSmart Login{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+    .login-container {
+        margin-top: 100px;
+    }
+</style>
+{% if alert_type %}
+    <div class="alert alert-{{ alert_type }}" role="alert">
+        {{ alert_message }}
+    </div>
+{% endif %}
+<div class="container mt-5">
+    <div>
+        <style>
+            .home-container {
+                background-color: #fff;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                max-width: 800px;
+                width: 100%;
+                overflow: auto;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                border-spacing: 0;
+                background-color: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                margin: 20px auto;
+            }
+            th, td {
+                border: 1px solid #dee2e6;
+                padding: 10px;
+                text-align: left;
+            }
+            th {
+                background-color: #f1f5f8;
+                font-weight: bold;
+            }
+            tr:nth-child(even) {
+                background-color: #f8f9fa;
+            }
+            tr:hover {
+                background-color: #e9ecef;
+            }
+            
+        </style>
+    </head>
+    <body>
+        <div class="container mt-5">
+            <form method="post" action="{% url 'budget' %}">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="year">Year:</label>
+                            <input type="number" class="form-control" id="year" name="year" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="month">Month:</label>
+                            <input type="number" class="form-control" id="month" name="month" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="home-container">
+            <h2>Budgets</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <!-- <th>Transaction ID</th> -->
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Expense</th>
+                        <th>Remaining Budget</th>
+                        <!-- <th>Note</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in data %}
+                    <tr class="transactionRow">
+                        <!-- <td>{{ txn.0 }} </td> -->
+                        <td>{{ i.0 }}</td>
+                        <td>{{ i.1 }}</td>
+                        <td>{{ i.3 }}</td>
+                        <td>{{ i.4 }}</td>
+                    </tr>
+                    {% endfor %}
+                    <!-- Add more transaction rows dynamically here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

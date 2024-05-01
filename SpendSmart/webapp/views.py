@@ -9,6 +9,7 @@ import calendar
 import json
 
 
+import datetime
 
 # Create your views here.
 def index(request):
@@ -241,8 +242,14 @@ def getAllTransactionsForUser(id):
         return txns
 
 def analysis(request):
+    c = request.COOKIES.get('id')
+    if c is None:
+        print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
+    context = {'user': { 'is_authenticated': True}}
+    # context['user.is_authenticated'] = True
     cur = connections['default'].cursor()
-    id = 1
+    id = c
     cur.execute("CALL GetMonthlyExpensePerCategorySortedNew({})".format(id))
     data = cur.fetchall()
     data = pd.DataFrame(data,columns=["Year","Month","Expense","Id","Category"])
@@ -252,7 +259,7 @@ def analysis(request):
     month = request.POST.get("month")
     year2 = request.POST.get("year2")
 
-    context = {}
+    
     context["Chart"] = None
     context["Chart2"] = None
 
@@ -264,11 +271,12 @@ def analysis(request):
         chart = fig.to_html()
         context["Chart"] = chart
     
-        if year2 == None:
+        if year2 == '':
             year2 = year
         year2 = int(year2)
+
         df = data.loc[(data['Year'] == year2)]
-        print(data.loc[(data['Year'] == 2024)])
+
         df = df.groupby(["Month"],as_index=False).sum()
         df['Month'] = df['Month'].apply(lambda x: calendar.month_abbr[x])
 
@@ -360,3 +368,44 @@ def insertTransaction( p_title, p_amount, p_type, p_userId, p_categoryId, p_note
     cur.execute("""CALL InsertTransaction({}, {}, {}, {}, {}, {}, {}, {});"""
                 .format(p_title, p_amount, p_type, p_userId, p_categoryId, p_note, p_paymentMethod, p_transactionDate))
     return cur.fetchall()
+
+def budget(request):
+    c = request.COOKIES.get('id')
+    if c is None:
+        print("COOKIES IS NON")
+        return render(request,"index.html", {'user': { 'is_authenticated': False}})
+    context = {'user': { 'is_authenticated': True}}
+    id = c
+
+    year = request.POST.get("year")
+    month = request.POST.get("month")
+    today = datetime.date.today()
+    cur = connections['default'].cursor()
+    if month == None and year == None:
+        month = int(today.month)
+        year = int(today.year)
+    print(year,month)
+    cur.execute('''SELECT categoryName, amount, m.categoryId
+                   FROM MonthlyCategoryBudget m JOIN Category c ON m.categoryId = c.categoryId
+                   WHERE m.UserId = {} and MONTH(month) = {} and YEAR(month) = {};'''.format(id,month,year))
+    data = cur.fetchall()
+    res = []
+    for i in range(len(data)):
+        d = list(data[i])
+        cur.execute("Call MonthlyCategoryExpense({},{},{},{})".format(id,d[2],year,month))
+
+        l = cur.fetchall()
+        if l == ():
+            l =0
+        else:
+            l = l[0][0]
+        
+        d.append(l)
+        d.append(d[1]-l)
+        res.append(d)
+    
+    # print(res)
+        
+    context['data'] = res
+
+    return render(request,"budget.html",context)
