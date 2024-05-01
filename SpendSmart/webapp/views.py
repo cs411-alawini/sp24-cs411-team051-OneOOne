@@ -335,8 +335,7 @@ def submitTransaction(request):
             print(txnId)
             if txnId is not None:
                 updateTransaction(txnId, description,amount,type,userId,category,note,paymentMethod,date)
-            else :
-                insertTransaction(description,amount,type,userId,category,note,paymentMethod,date)
+            insertTransaction(description,amount,type,userId,category,note,paymentMethod,date)
             return redirect('transactions')
         
 
@@ -663,8 +662,8 @@ def add_split(request):
                         SET @split_id = LAST_INSERT_ID();
                         
                         
-                        INSERT INTO Transaction(title, amount, note, type, userId) 
-                        SELECT '{"Split: " + title}', {my_amount}, '{note}', '{'Expense'}', {id}
+                        INSERT INTO Transaction(title, amount, note, type, userId, categoryId) 
+                        SELECT '{"Split: " + title}', {my_amount}, '{note}', '{'Expense'}', {id}, {31}
                         FROM DUAL
                         WHERE {my_amount} > 0;
                         

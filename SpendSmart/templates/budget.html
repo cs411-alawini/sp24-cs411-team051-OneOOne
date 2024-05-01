@@ -105,7 +105,7 @@
                         </thead>
                         <tbody>
                             {% for i in data %}
-                            <tr class="transactionRow">
+                            <tr class="transactionRow" {% if i.4 < 0 %}style="color: #ff0000;"{% endif %}>
 
                                 <td>{{ i.0 }}</td>
                                 <td>{{ i.1 }}</td>
@@ -153,8 +153,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="category" class="form-label">Sub-category:</label>
-                        <select class="form-select" id="sub-category" name="sub-category">
+                        <select class="form-select" id="sub-category" name="sub-category" hidden>
                             <option value="">Select a subcategory...</option>
                         </select>
                     </div>
