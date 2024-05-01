@@ -3,32 +3,57 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>Welcome home</h1>
 <style>
     .table-responsive {
-    max-height:800px;
+    max-height:700px;
 }
+.custom-container {
+      background-color: #f0f0f0; /* Grey color */
+    }
 </style>
+<!-- {{transactions}} -->
 <div>
     <div class="row">
         <div class="col-md-8">
             <!-- First vertical division -->
+            <h3 class="ml-3">All transactions</h3>
             <div class="container table-responsive">
-                <h2>All transactions</h2>
+                
                 <table class="table table-striped">
                     <thead>
                         <tr>
+
+                            <th>#</th>
                             <th>Description</th>
-                            <th>Date</th>
                             <th>Amount</th>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <!-- <th>Type</th> -->
+                            <th scope="col" class="d-none">type</th> <!-- Hidden column -->
+                            <th scope="col" class="d-none">CateId</th> <!-- Hidden column -->
+                            <th scope="col" class="d-none">parentCatId</th> <!-- Hidden column -->
+                            <th scope="col" class="d-none">Note</th> <!-- Hidden column -->
+                            <th scope="col" class="d-none">paymentMethod</th> <!-- Hidden column -->
+                            <th scope="col" class="d-none">txnId</th> <!-- Hidden column -->
+
                         </tr>
                     </thead>
-                  <tbody class="">
+                  <tbody>
                     {% for transaction in transactions %}
                         <tr>
-                            <td>{{ transaction.0 }}</td>
-                            <td>{{ transaction.1|date:"Y-m-d"  }}</td>
-                            <td>{{ transaction.2 }}</td>
+                            <!-- txnId|amount | timestamp | type   | categoryName | title | type   | categoryId | parentCategoryId | note | paymentMethod | parentCategoryName -->
+                            <td>{{ forloop.counter}}</td>
+                            <td>{{ transaction.5 }}</td>
+                            <td>{{ transaction.1 }}</td>
+                            <td>{{ transaction.2|date:"Y-m-d"  }}</td>
+                            <td>{{ transaction.4 }}</td>
+                            <td class="d-none">{{ transaction.3 }}</td>
+                            <td class="d-none">{{ transaction.7 }}</td>
+                            <td class="d-none">{{ transaction.8 }}</td>
+                            <td class="d-none">{{ transaction.9 }}</td>
+                            <td class="d-none">{{ transaction.10 }}</td>
+                            <td class="d-none">{{ transaction.0 }}</td>
+                            <!-- <td>{{ transaction.2 }}</td> -->
                         </tr>
                         {% endfor %}
                   </tbody>
@@ -37,8 +62,8 @@
         </div>
         <div class="col-md-4">
             <!-- Second vertical division -->
-            <div class="container">
-                <h2 class="mt-5 mb-4">Expense Form</h2>
+            <div class="container custom-container pb-3 pt-3">
+                <h2 class="mt-1 mb-1">Add transaction</h2>
             
                 <form id="expenseForm" method="post" action="{% url 'submitTransaction' %}">
                     {% csrf_token %}
@@ -104,7 +129,165 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="transactionModal" tabindex="-1" role="dialog" aria-labelledby="transactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="transactionModalLabel">Edit Transaction</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <form id="expenseForm1" method="post" action="{% url 'submitTransaction' %}">
+                {% csrf_token %}
+                <input type="text" class="form-control" id="txnId1" name="txnId1" hidden>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <input type="text" class="form-control" id="description1" name="description">
+                </div>
+        
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount:</label>
+                    <input type="number" class="form-control" id="amount1" name="amount" step="0.01" required>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date:</label>
+                    <input type="date" class="form-control" id="date1" name="date">
+                </div>
+        
+                <div class="mb-3">
+                    <label for="type" class="form-label">Type:</label>
+                    <select class="form-select" id="type1" name="type" required>
+                        <option value="Income">Income</option>
+                        <option value="Expense">Expense</option>
+                    </select>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category:</label>
+                    <select class="form-select" id="category1" name="category" >
+                        <option value="">Select a category...</option>
+                        {% for id, value in parentCategories %}
+                            <option value="{{ id }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
+                <div class="mb-3">
+                    <label for="category" class="form-label">Sub-category:</label>
+                    <select class="form-select" id="sub-category1" name="sub-category">
+                        <option value="">Select a subcategory...</option>
+                    </select>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="note" class="form-label">Note:</label>
+                    <textarea class="form-control" id="note1" name="note" rows="4"></textarea>
+                </div>
+        
+                <div class="mb-3">
+                    <label for="paymentMethod" class="form-label">Payment Method:</label>
+                    <select class="form-select" id="paymentMethod1" name="paymentMethod" required>
+                        <option value="Cash">Cash</option>
+                        <option value="Credit Card">Credit Card</option>
+                        <option value="Debit Card">Debit Card</option>
+                        <option value="Zelle">Zelle</option>
+                        <!-- Add more payment methods as needed -->
+                    </select>
+                </div>
+        
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            <form id = "formxyz" method="post" action="{% url 'deleteTransaction' %}" class="mt-3">
+                {% csrf_token %}
+                    <input hidden id="txnId2" name = "txnId2"></input>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function() {
+      // Add click event listener to table rows
+      $('tbody tr').click(function() {
+        // Get the data from the clicked row
+        var rowData = $(this).find('td').map(function() {
+          return $(this).text();
+        }).get();
+        console.log(rowData);
+        // Populate the form fields in the modal with the row data
+        // $('#title').val(rowData[1]);
+        // $('#amount1').val(parseInt(rowData[2]));
+        // $('#type').val(rowData[3]);
+        // $('#category').val(rowData[4]);
+        // $('#timestamp').val(rowData[5]);
+
+        $('#description1').val(rowData[1]);
+        $('#amount1').val(rowData[2]);
+        $('#date1').val(rowData[3]);
+        $('#type1').val(rowData[5]);
+        if(rowData[7]=='None'){
+            $('#category1').val(rowData[6]);
+        }
+        else 
+            $('#category1').val(rowData[7]);
+        console.log(rowData[7])
+        var dropdown1 = document.getElementById('category1');
+        var dropdown2 = document.getElementById('sub-category1');
+
+        // Define options for each category
+        var categoryOptions = JSON.parse('{{grouupedCategories|escapejs}}')
+        // console.log(categoryOptions);
+
+        // Function to populate dropdown2 based on the selected value in dropdown1
+        function populateDropdown3() {
+            // Clear existing options in dropdown2
+            dropdown2.innerHTML = '';
+
+            // Get the selected category from dropdown1
+            var selectedCategory = dropdown1.value;
+            var emptyOption = document.createElement('option');
+            emptyOption.value = ''; // Set the value of the option
+            emptyOption.textContent = 'Select an option...'; // Set the text content of the option
+
+            // Append the empty default option to the select element
+            dropdown2.appendChild(emptyOption);
+
+            if(selectedCategory!=""){
+                // Get the options for the selected category
+                var options = categoryOptions[selectedCategory];
+
+                // Populate dropdown2 with options for the selected category
+                options.forEach(function(option) {
+                    var optionElement = document.createElement('option');
+                    optionElement.textContent = option[1];
+                    optionElement.value = option[0];
+                    dropdown2.appendChild(optionElement);
+                });
+            }
+        }
+
+        // Populate dropdown2 initially
+        populateDropdown3();
+
+        // Add event listener to dropdown1 to update dropdown2 when selection changes
+        dropdown1.addEventListener('change', populateDropdown3);
+        if(rowData[6]!='None' && parseInt(rowData[6])>5){
+        $('#sub-category1').val(rowData[6]);}
+        $('#note1').val(rowData[8]);
+        
+        $('#paymentMethod1').val(rowData[9]);
+        $('#txnId1').val(parseInt(rowData[10]));
+        $('#txnId2').val(parseInt(rowData[10]));
+  
+        // Show the modal
+        $('#transactionModal').modal('show');
+      });
+    });
+  </script>
 <script>
     // Get references to both dropdowns
     var dropdown1 = document.getElementById('category');
@@ -112,7 +295,7 @@
 
     // Define options for each category
     var categoryOptions = JSON.parse('{{grouupedCategories|escapejs}}')
-    console.log(categoryOptions);
+    // console.log(categoryOptions);
 
     // Function to populate dropdown2 based on the selected value in dropdown1
     function populateDropdown2() {
@@ -148,6 +331,8 @@
     // Add event listener to dropdown1 to update dropdown2 when selection changes
     dropdown1.addEventListener('change', populateDropdown2);
 </script>
+
+
 
 
 

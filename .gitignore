@@ -3,3 +3,5 @@
 */migrations/
 *.pyc
 *.venv
+.vscode/
+myenv

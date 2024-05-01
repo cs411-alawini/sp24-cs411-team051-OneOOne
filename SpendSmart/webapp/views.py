@@ -66,6 +66,10 @@ def home(request):
     transactions = getAllTransactionsForUser(id)
     # print(transactions)
     context["transactions"] = transactions
+    ie = getCurrentExpenseAndIncome(id)
+    # print(ie[0][0])
+    context["income"] = ie[0][0]
+    context["expense"] = ie[0][1]
     return render(request,"home.html",context)
 
 def home1(request):
@@ -183,6 +187,16 @@ def getAllTransactionsForUser(id):
                    """.format(id,id))
         txns = cur.fetchall() 
         return txns
+    
+def getTransactionsForUser(id):
+    if id is None:
+        return []
+    else:
+        cur = connections['default'].cursor()
+        cur.execute("""call GetTransactionsByUserId({})
+                   """.format(id))
+        txns = cur.fetchall() 
+        return txns
 
 def analysis(request):
     c = request.COOKIES.get('id')
@@ -241,7 +255,8 @@ def transactions(request):
         return render(request,"index.html", {'user': { 'is_authenticated': False}})
     context = {'user': { 'is_authenticated': True}}
     id = c
-    transactions = getAllTransactionsForUser(id)
+    transactions = getTransactionsForUser(id)
+    # print(transactions)
     categories = getCategoriesForUser(id)
     # print(categories)
     parentCategories = [[tup[0], tup[1]] for tup in categories if tup[2] is None]
@@ -263,6 +278,29 @@ def transactions(request):
     # context['user']
     return render(request,"transactions.html",context)
 
+def deleteTransaction(request):
+    if request.method == 'GET':
+        return redirect('index')
+    else:
+        userId = getUserId(request)
+        if userId is None:
+            return redirect('index')
+        else: 
+            print("DELETEEE")
+            print(request.POST)
+            txnId = None
+            if 'txnId2' in request.POST:
+                txnId = request.POST['txnId2']
+                print(txnId)
+                deleteTransactionSql(txnId)
+            return redirect('transactions')
+
+def deleteTransactionSql(txnId):
+    cur = connections['default'].cursor()
+    print("""delete from Transaction where txnId = {};""".format(txnId))
+    cur.execute("""delete from Transaction where txnId = {};""".format(txnId))
+    return cur.fetchall()
+
 def submitTransaction(request):
     # print("here")
     if request.method == 'GET':
@@ -274,6 +312,9 @@ def submitTransaction(request):
         else: 
             print("FOMRM")
             print(request.POST)
+            txnId = None
+            if 'txnId1' in request.POST:
+                txnId = request.POST['txnId1']
             description = request.POST['description']
             amount = request.POST['amount']
             date = request.POST['date']
@@ -287,10 +328,13 @@ def submitTransaction(request):
             type = "'"+type+"'"
             paymentMethod = "'"+paymentMethod+"'"
             note = "'"+note+"'" if note != '' else 'NULL'
-            description = "'"+description+"'" if description != '' else 'NULL'
+            description = "\""+description+"\"" if description != '' else 'NULL'
             date = "'"+date+"'" if date != '' else 'NULL'
-            category = "'"+subcategory+"'" if subcategory != '' else "'"+category+"'" if category != '' else 'NULL'
+            category = "'"+subcategory+"'" if (subcategory != '') else "'"+category+"'" if category != '' else 'NULL'
             # subcategory =  'NULL'
+            print(txnId)
+            if txnId is not None:
+                updateTransaction(txnId, description,amount,type,userId,category,note,paymentMethod,date)
             insertTransaction(description,amount,type,userId,category,note,paymentMethod,date)
             return redirect('transactions')
         
@@ -303,7 +347,20 @@ def getCategoriesForUser(userId):
     cur = connections['default'].cursor()
     cur.execute("""call GetCategories({});""".format(userId))
     return cur.fetchall()
+
+def getCurrentExpenseAndIncome(userId):
+    cur = connections['default'].cursor()
+    cur.execute("""call GetIncomeAndExpenseOfCurrentMonth({});""".format(userId))
+    return cur.fetchall()
     
+def updateTransaction(txnId, p_title, p_amount, p_type, p_userId, p_categoryId, p_note, p_paymentMethod, p_transactionDate):
+    cur = connections['default'].cursor()
+    query = """CALL UpdateTransaction({},{}, {}, {}, {}, {}, {}, {});""".format(txnId, p_amount, p_type, p_transactionDate, p_title, p_categoryId, p_note, p_paymentMethod)
+    print(query)
+    cur.execute("""CALL UpdateTransaction({},{}, {}, {}, {}, {}, {}, {});"""
+                .format(txnId, p_amount, p_type, p_transactionDate, p_title, p_categoryId, p_note, p_paymentMethod))
+    return cur.fetchall()
+
 def insertTransaction( p_title, p_amount, p_type, p_userId, p_categoryId, p_note, p_paymentMethod, p_transactionDate):
     cur = connections['default'].cursor()
     query = """CALL InsertTransaction({}, {}, {}, {}, {}, {}, {}, {});""".format(p_title, p_amount, p_type, p_userId, p_categoryId, p_note, p_paymentMethod, p_transactionDate)

@@ -19,4 +19,6 @@ urlpatterns = [
     path("add-split",views.add_split,name="add-split"),
     path("pay",views.pay,name="pay"),
     path("createUser",views.createUser,name="createUser"),
+    path("deleteTransaction",views.deleteTransaction,name="deleteTransaction")
+    
 ]
