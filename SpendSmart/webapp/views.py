@@ -3,7 +3,9 @@ from django.http import HttpResponse
 from django.contrib.auth.models import User, auth
 from django.db import connections
 from django.contrib.auth.forms import AuthenticationForm
-
+import plotly.express as px
+import pandas as pd
+import calendar
 
 # Create your views here.
 def index(request):
@@ -235,3 +237,46 @@ def getAllTransactionsForUser(id):
                    """.format(id,id))
         txns = cur.fetchall() 
         return txns
+
+def analysis(request):
+    cur = connections['default'].cursor()
+    id = 1
+    cur.execute("CALL GetMonthlyExpensePerCategorySortedNew({})".format(id))
+    data = cur.fetchall()
+    data = pd.DataFrame(data,columns=["Year","Month","Expense","Id","Category"])
+   
+
+    year = request.POST.get("year")
+    month = request.POST.get("month")
+    year2 = request.POST.get("year2")
+
+    context = {}
+    context["Chart"] = None
+    context["Chart2"] = None
+
+    if year != None and month != None:
+        year = int(year)
+        month = int(month)
+        df = data.loc[(data['Year'] == year) & (data['Month'] == month)]
+        fig = px.pie(df, names="Category", values="Expense", hole=0.5,hover_name="Category")
+        chart = fig.to_html()
+        context["Chart"] = chart
+    
+        if year2 == None:
+            year2 = year
+        year2 = int(year2)
+        df = data.loc[(data['Year'] == year2)]
+        print(data.loc[(data['Year'] == 2024)])
+        df = df.groupby(["Month"],as_index=False).sum()
+        df['Month'] = df['Month'].apply(lambda x: calendar.month_abbr[x])
+
+        fig = px.bar(df,x="Month",y="Expense")
+        fig.update_xaxes(type='category')
+        chart2 = fig.to_html()
+        context["Chart2"] = chart2
+
+    context['year'] = year
+    context['month'] = month
+    context['year2'] = year2
+
+    return render(request,"analysis.html",context)
