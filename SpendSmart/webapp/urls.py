@@ -11,5 +11,7 @@ urlpatterns = [
     path("analysis",views.analysis,name="analysis"),
     path("transactions",views.transactions,name="transactions"),
     path("submitTransaction",views.submitTransaction,name="submitTransaction"),
-    path("budget",views.budget,name="budget")
+    path("budget",views.budget,name="budget"),
+    path("submitBudget",views.submitBudget,name="submitBudget"),
+    path("splits",views.splits,name="splits")
 ]

@@ -377,6 +377,24 @@ def budget(request):
     context = {'user': { 'is_authenticated': True}}
     id = c
 
+    categories = getCategoriesForUser(id)
+    # print(categories)
+    parentCategories = [[tup[0], tup[1]] for tup in categories if tup[2] is None]
+    grouupedCategories = {}
+    for tup in categories:
+        if tup[2] not in grouupedCategories:
+            grouupedCategories[tup[2]] = []
+        grouupedCategories[tup[2]].append([tup[0], tup[1]])
+
+    # Convert the dictionary to a list of tuples
+    # result = [(key, value) for key, value in grouupedCategories.items()]
+
+    # print(result)
+    # print(parentCategories)
+    # print(transactions)
+    context["parentCategories"] = parentCategories
+    context["grouupedCategories"] = json.dumps(grouupedCategories)
+
     year = request.POST.get("year")
     month = request.POST.get("month")
     today = datetime.date.today()
@@ -409,3 +427,37 @@ def budget(request):
     context['data'] = res
 
     return render(request,"budget.html",context)
+
+def submitBudget(request):
+    # print("here")
+    if request.method == 'GET':
+        return redirect('')
+    else:
+        userId = getUserId(request)
+        if userId is None:
+            redirect('')
+        else: 
+            print(request.POST)
+            description = request.POST['description']
+            amount = request.POST['amount']
+            date = request.POST['date']
+            category = request.POST['category']
+            subcategory = request.POST['sub-category']
+            print(date)
+            print(amount)
+
+            # subcategory =  'NULL'
+            description = "'"+ description + "'"
+            date = "'" + date + "'"
+            insertBudget(description,amount,date,category,userId)
+            return redirect('budget')
+
+def insertBudget( p_description, p_amount, p_date, p_categoryId, p_userId):
+    cur = connections['default'].cursor()
+    query = """INSERT INTO MonthlyCategoryBudget (description,amount,month,categoryId,userId) VALUES ({},{},{},{},{});""".format(p_description, p_amount, p_date, p_categoryId, p_userId)
+    print(query)
+    cur.execute(query)
+    return cur.fetchall()
+
+def splits(request):
+    return render(request,"splits.html")
