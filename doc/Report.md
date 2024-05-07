@@ -51,6 +51,9 @@ between 1 to 100 $ while generating expenses data. If you want to generate users
 to then generate usernames and email ids.
 2. If the application makes multiple calls to the database for a single function, it slows down the application. So we should try to keep all the logic on the database and minimize
   calls to the database improving the performance of the application. In our experience stored procedure is a great way to achieve this level of abstraction.
+3. Implementing the splitting functionality required being able to dynamically suggest users to add to the split based on the user input letters. This required us to either get all user information from the database or query the database on every key-up, and both approaches have their own technical challenges.
+4. It was a challenge to pass the user data across the pages to solve this, the user authentication was implemented using cookies, we added a new cookie key value pair that stores the user id for implementation of the logic. This allowed us to make sure that only authenticated users can access the system.
+
 
 ## Other changes
 
